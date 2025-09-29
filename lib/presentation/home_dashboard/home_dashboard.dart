@@ -1,3 +1,6 @@
+import '../library_screen/Library-screen.dart';
+
+import '../interactive_timeline/interactive_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -58,31 +61,33 @@ class _HomeDashboardState extends State<HomeDashboard> {
     }
   }
 
+  
   void _onNavigationTap(String destination) {
-    switch (destination) {
-      case 'library':
-        // Navigate to library - route to be added
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('المكتبة قريبًا')),
-        );
-        break;
-      case 'discovery':
-        Navigator.pushNamed(context, AppRoutes.todaySDiscovery);
-        break;
-      case 'chatbot':
-        // Navigate to chatbot - route to be added
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('الذكاء الاصطناعي قريبًا')),
-        );
-        break;
-      case 'timeline':
-        // Navigate to timeline - route to be added
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('الخط الزمني قريبًا')),
-        );
-        break;
-    }
+  switch (destination) {
+    case 'library':
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LibraryScreen()),
+    );
+    break;
+
+    case 'discovery':
+      Navigator.pushNamed(context, AppRoutes.todaySDiscovery);
+      break;
+    case 'chatbot':
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('الذكاء الاصطناعي قريبًا')),
+      );
+      break;
+    case 'timeline':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const InteractiveTimeline()),
+      );
+      break;
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
