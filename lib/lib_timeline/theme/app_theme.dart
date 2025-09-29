@@ -126,7 +126,7 @@ class AppTheme {
     ),
 
     // Card theme with minimal elevation
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: cardLight,
       elevation: 2.0, // Minimal elevation as per design
       shape: RoundedRectangleBorder(
@@ -301,7 +301,7 @@ class AppTheme {
     ),
 
     // Tab bar theme for timeline navigation
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: TabBarThemeData(
       labelColor: primaryLight,
       unselectedLabelColor: textSecondaryLight,
       indicatorColor: secondaryLight,
@@ -393,7 +393,7 @@ class AppTheme {
         size: 24,
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: cardDark,
       elevation: 2.0,
       shape: RoundedRectangleBorder(
@@ -544,7 +544,7 @@ class AppTheme {
       overlayColor: primaryDark.withValues(alpha: 0.2),
       inactiveTrackColor: dividerDark,
     ),
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: TabBarThemeData(
       labelColor: primaryDark,
       unselectedLabelColor: textSecondaryDark,
       indicatorColor: secondaryDark,

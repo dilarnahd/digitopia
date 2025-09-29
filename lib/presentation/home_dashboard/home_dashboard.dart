@@ -1,6 +1,9 @@
+import 'package:url_launcher/url_launcher.dart';
+
 import '../library_screen/Library-screen.dart';
 
-import '../interactive_timeline/interactive_timeline.dart';
+import 'package:egyptquest/presentation/interactive_timeline/interactive_timeline.dart';
+
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -62,23 +65,33 @@ class _HomeDashboardState extends State<HomeDashboard> {
   }
 
   
-  void _onNavigationTap(String destination) {
+void _onNavigationTap(String destination) async {
   switch (destination) {
     case 'library':
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const LibraryScreen()),
-    );
-    break;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const LibraryScreen()),
+      );
+      break;
 
     case 'discovery':
       Navigator.pushNamed(context, AppRoutes.todaySDiscovery);
       break;
+
     case 'chatbot':
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الذكاء الاصطناعي قريبًا')),
-      );
+      final Uri url = Uri.parse(
+          'https://9000-firebase-studio-1759168044857.cluster-lu4mup47g5gm4rtyvhzpwbfadi.cloudworkstations.dev/');
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('تعذر فتح الرابط')),
+          );
+        }
+      }
       break;
+
     case 'timeline':
       Navigator.push(
         context,

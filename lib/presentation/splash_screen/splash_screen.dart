@@ -1,6 +1,9 @@
+import 'package:egyptquest/core/app_export.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
+import '../../services/supabase_service.dart';
+
 
 
 class SplashScreen extends StatefulWidget {
@@ -125,21 +128,40 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(milliseconds: 400));
   }
 
-  void _navigateToNextScreen() {
-    // Simulate authentication check
-    final bool isAuthenticated = false; // Mock authentication status
-    final bool isFirstTime = true; // Mock first time user status
+Future<void> _navigateToNextScreen() async {
+  // Check authentication
+  final user = SupabaseService.instance.client.auth.currentUser;
 
-    _fadeAnimationController.forward().then((_) {
-      if (isAuthenticated) {
-        Navigator.pushReplacementNamed(context, '/home-dashboard');
-      } else if (isFirstTime) {
-        Navigator.pushReplacementNamed(context, '/onboarding-video-screen');
-      } else {
-        Navigator.pushReplacementNamed(context, '/login-screen');
-      }
-    });
+  if (user == null) {
+    // No logged in user → go to Login
+    Navigator.pushReplacementNamed(context, AppRoutes.login);
+    return;
   }
+
+  // Check if player info exists
+  final profile = await SupabaseService.instance.getUserProfile();
+  final bool isProfileIncomplete =
+      profile == null || profile['profile_completed'] == false;
+
+  if (isProfileIncomplete) {
+    // Player info not filled → go to Player Info screen
+    Navigator.pushReplacementNamed(context, AppRoutes.playerInfoCollection);
+    return;
+  }
+
+  // Check if first time for onboarding
+  final bool isFirstTime = profile['is_first_time'] ?? true;
+  if (isFirstTime) {
+    Navigator.pushReplacementNamed(context, AppRoutes.onboardingVideo);
+    return;
+  }
+
+  // Else go to Home
+  Navigator.pushReplacementNamed(context, AppRoutes.homeDashboard);
+}
+
+
+
 
   void _showRetryOption() {
     showDialog(

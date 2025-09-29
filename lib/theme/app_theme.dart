@@ -100,7 +100,7 @@ class AppTheme {
       ),
       iconTheme: IconThemeData(color: accentLight),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: cardLight,
       elevation: 2.0,
       shape: RoundedRectangleBorder(
@@ -245,7 +245,7 @@ class AppTheme {
       overlayColor: accentLight.withValues(alpha: 0.2),
       inactiveTrackColor: textSecondaryLight.withValues(alpha: 0.3),
     ),
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: TabBarThemeData(
       labelColor: accentLight,
       unselectedLabelColor: textSecondaryLight,
       indicatorColor: accentLight,
@@ -323,7 +323,7 @@ class AppTheme {
       ),
       iconTheme: IconThemeData(color: accentDark),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: cardDark,
       elevation: 2.0,
       shape: RoundedRectangleBorder(
@@ -468,7 +468,7 @@ class AppTheme {
       overlayColor: accentDark.withValues(alpha: 0.2),
       inactiveTrackColor: textSecondaryDark.withValues(alpha: 0.3),
     ),
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: TabBarThemeData(
       labelColor: accentDark,
       unselectedLabelColor: textSecondaryDark,
       indicatorColor: accentDark,
