@@ -1,0 +1,631 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:sizer/sizer.dart';
+
+import '../../core/app_export.dart';
+import '../../services/supabase_service.dart';
+
+class PlayerInfoCollectionScreen extends StatefulWidget {
+  const PlayerInfoCollectionScreen({super.key});
+
+  @override
+  State<PlayerInfoCollectionScreen> createState() =>
+      _PlayerInfoCollectionScreenState();
+}
+
+class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
+    with TickerProviderStateMixin {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _knowledgeController = TextEditingController();
+  final TextEditingController _identityController = TextEditingController();
+  final TextEditingController _interestController = TextEditingController();
+  final TextEditingController _learningController = TextEditingController();
+  final TextEditingController _gamingController = TextEditingController();
+  final TextEditingController _historicalController = TextEditingController();
+
+  String? selectedAge;
+  String? selectedLocation;
+  String? selectedKnowledge;
+  String? selectedIdentity;
+  String? selectedInterest;
+  String? selectedLearning;
+  String? selectedGaming;
+  String? selectedHistorical;
+
+  bool _isLoading = false;
+  int currentQuestionIndex = 0;
+
+  final List<Map<String, dynamic>> egyptianQuestions = [
+    {
+      'question': 'اسمك ايه؟',
+      'type': 'text',
+      'controller': null,
+      'field': 'name',
+    },
+    {
+      'question': 'عندك كام سنة؟',
+      'type': 'dropdown',
+      'options': ['١٠–١٣', '١٤–١٦', '١٧–١٩', '٢٠+'],
+      'field': 'age',
+    },
+    {
+      'question': 'ساكن فين في مصر؟',
+      'type': 'dropdown',
+      'options': [
+        'القاهرة',
+        'اسكندرية',
+        'الصعيد',
+        'الدلتا',
+        'القنال',
+        'سينا',
+        'مناطق تانية'
+      ],
+      'field': 'location',
+    },
+    {
+      'question': 'بتعرف قد ايه عن تاريخ مصر؟',
+      'type': 'options',
+      'options': [
+        'قليل اوي (محتاج اتعلم)',
+        'متوسط (عارف شوية)',
+        'جامد (فاكر نفسي مؤرخ)'
+      ],
+      'field': 'knowledge',
+    },
+    {
+      'question': 'حاسس انك فاهم هويتك المصرية قد ايه؟',
+      'type': 'options',
+      'options': ['مش قوي', 'نص نص', 'فخور ومبسوط بيها'],
+      'field': 'identity',
+    },
+    {
+      'question': 'ايه اكتر حاجة بتحبها؟',
+      'type': 'options',
+      'options': ['رياضة', 'موسيقى', 'افلام', 'جيمز', 'قراءة', 'تكنولوجيا'],
+      'field': 'interest',
+    },
+    {
+      'question': 'بتحب تتعلم/تلعب ازاي؟',
+      'type': 'options',
+      'options': ['قصص', 'مسابقات', 'قراءة', 'لعب عملي'],
+      'field': 'learning',
+    },
+    {
+      'question': 'بتلعب جيمز قد ايه؟',
+      'type': 'options',
+      'options': ['كل يوم', 'كل فترة', 'نادر'],
+      'field': 'gaming',
+    },
+    {
+      'question': 'لو معاك آلة زمن تروح انهي فترة؟',
+      'type': 'options',
+      'options': ['الفرعوني', 'الاسلامي', 'الحديث', 'دلوقتي'],
+      'field': 'historical',
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _ageController.dispose();
+    _locationController.dispose();
+    _knowledgeController.dispose();
+    _identityController.dispose();
+    _interestController.dispose();
+    _learningController.dispose();
+    _gamingController.dispose();
+    _historicalController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadSavedData() async {
+    try {
+      final playerInfo = await SupabaseService.instance.getPlayerInfo();
+      if (playerInfo != null && mounted) {
+        setState(() {
+          _nameController.text = playerInfo['player_name'] ?? '';
+          selectedAge = playerInfo['player_age']?.toString();
+          selectedLocation = playerInfo['player_location'] ?? '';
+          selectedKnowledge = playerInfo['egypt_knowledge_level'] ?? '';
+          selectedIdentity = playerInfo['egyptian_identity_feeling'] ?? '';
+          selectedInterest = playerInfo['favorite_activity'] ?? '';
+          selectedLearning = playerInfo['learning_preference'] ?? '';
+          selectedGaming = playerInfo['gaming_frequency'] ?? '';
+          selectedHistorical = playerInfo['historical_period_preference'] ?? '';
+        });
+      }
+    } catch (e) {
+      // Silent fail - continue with defaults
+    }
+  }
+
+  bool get _isFormValid {
+    return _nameController.text.trim().isNotEmpty &&
+        selectedAge != null &&
+        selectedLocation != null &&
+        selectedKnowledge != null &&
+        selectedIdentity != null &&
+        selectedInterest != null &&
+        selectedLearning != null &&
+        selectedGaming != null &&
+        selectedHistorical != null;
+  }
+
+  double get _progressPercentage {
+    int answered = 0;
+    if (_nameController.text.trim().isNotEmpty) answered++;
+    if (selectedAge != null) answered++;
+    if (selectedLocation != null) answered++;
+    if (selectedKnowledge != null) answered++;
+    if (selectedIdentity != null) answered++;
+    if (selectedInterest != null) answered++;
+    if (selectedLearning != null) answered++;
+    if (selectedGaming != null) answered++;
+    if (selectedHistorical != null) answered++;
+    return answered / egyptianQuestions.length;
+  }
+
+  Future<void> _handleContinue() async {
+    if (!_isFormValid) {
+      _showValidationMessage();
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await SupabaseService.instance.updatePlayerInfo(
+        playerName: _nameController.text.trim(),
+        playerAge: _getAgeValue(selectedAge!),
+        playerLocation: selectedLocation!,
+        egyptKnowledgeLevel: selectedKnowledge!,
+        egyptianIdentityFeeling: selectedIdentity!,
+        favoriteActivity: selectedInterest!,
+        learningPreference: selectedLearning!,
+        gamingFrequency: selectedGaming!,
+        historicalPeriodPreference: selectedHistorical!,
+        profileCompleted: true,
+        isFirstTime: false,
+      );
+
+      if (mounted) {
+        HapticFeedback.lightImpact();
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRoutes.onboardingVideo,
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Fluttertoast.showToast(
+          msg: 'حدث خطأ، حاول مرة أخرى',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: AppTheme.lightTheme.colorScheme.error,
+          textColor: Colors.white,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  int _getAgeValue(String ageRange) {
+    switch (ageRange) {
+      case '١٠–١٣':
+        return 12;
+      case '١٤–١٦':
+        return 15;
+      case '١٧–١٩':
+        return 18;
+      case '٢٠+':
+        return 25;
+      default:
+        return 15;
+    }
+  }
+
+  void _showValidationMessage() {
+    Fluttertoast.showToast(
+      msg: 'من فضلك اجب على جميع الأسئلة',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: AppTheme.lightTheme.colorScheme.error,
+      textColor: Colors.white,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF264653),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Container(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    MediaQuery.of(context).padding.bottom,
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+                child: Center(
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6.w,
+                      vertical: 5.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE5C687),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Title
+                        Text(
+                          'عرفنا عليك',
+                          style: GoogleFonts.inter(
+                            fontSize: 26.sp,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF264653),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+
+                        SizedBox(height: 3.h),
+
+                        // Progress Bar
+                        Container(
+                          width: double.infinity,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: LinearProgressIndicator(
+                            value: _progressPercentage,
+                            backgroundColor: Colors.transparent,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Color(0xFF264653),
+                            ),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+
+                        SizedBox(height: 1.h),
+
+                        // Progress Text
+                        Text(
+                          '${(_progressPercentage * 100).round()}% مكتملة',
+                          style: GoogleFonts.inter(
+                            fontSize: 12.sp,
+                            color: const Color(0xFF264653),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+
+                        SizedBox(height: 4.h),
+
+                        // Questions
+                        ...egyptianQuestions.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final question = entry.value;
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 3.h),
+                            child: _buildQuestionWidget(question, index),
+                          );
+                        }).toList(),
+
+                        SizedBox(height: 3.h),
+
+                        // Continue Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 6.h,
+                          child: ElevatedButton(
+                            onPressed: _isFormValid && !_isLoading
+                                ? _handleContinue
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _isFormValid && !_isLoading
+                                  ? const Color(0xFF264653)
+                                  : Colors.grey.shade400,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 2,
+                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    'متابعة إلى الفيديو',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuestionWidget(Map<String, dynamic> question, int index) {
+    final questionText = question['question'] as String;
+    final type = question['type'] as String;
+    final field = question['field'] as String;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        // Question Label
+        Padding(
+          padding: EdgeInsets.only(bottom: 1.h),
+          child: Text(
+            '${index + 1}. $questionText',
+            style: GoogleFonts.inter(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF264653),
+            ),
+            textAlign: TextAlign.right,
+          ),
+        ),
+
+        // Question Input
+        if (type == 'text') ...[
+          _buildTextInput(field),
+        ] else if (type == 'dropdown') ...[
+          _buildDropdownInput(field, question['options'] as List<String>),
+        ] else if (type == 'options') ...[
+          _buildOptionsInput(field, question['options'] as List<String>),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildTextInput(String field) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF264653).withValues(alpha: 0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _nameController,
+        textDirection: TextDirection.rtl,
+        textAlign: TextAlign.right,
+        style: GoogleFonts.inter(
+          fontSize: 15.sp,
+          color: const Color(0xFF264653),
+          fontWeight: FontWeight.w500,
+        ),
+        decoration: InputDecoration(
+          hintText: 'اكتب اسمك هنا...',
+          hintStyle: GoogleFonts.inter(
+            color: Colors.grey.shade500,
+            fontSize: 15.sp,
+            fontWeight: FontWeight.w400,
+          ),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+        ),
+        onChanged: (value) => setState(() {}),
+      ),
+    );
+  }
+
+  Widget _buildDropdownInput(String field, List<String> options) {
+    String? currentValue;
+    switch (field) {
+      case 'age':
+        currentValue = selectedAge;
+        break;
+      case 'location':
+        currentValue = selectedLocation;
+        break;
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF264653).withValues(alpha: 0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: currentValue,
+          hint: Text(
+            'اختار من القائمة...',
+            style: GoogleFonts.inter(
+              color: Colors.grey.shade500,
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          isExpanded: true,
+          style: GoogleFonts.inter(
+            fontSize: 15.sp,
+            color: const Color(0xFF264653),
+            fontWeight: FontWeight.w500,
+          ),
+          items: options.map((String option) {
+            return DropdownMenuItem<String>(
+              value: option,
+              alignment: AlignmentDirectional.centerEnd,
+              child: Text(
+                option,
+                textDirection: TextDirection.rtl,
+              ),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              switch (field) {
+                case 'age':
+                  selectedAge = newValue;
+                  break;
+                case 'location':
+                  selectedLocation = newValue;
+                  break;
+              }
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionsInput(String field, List<String> options) {
+    String? currentValue;
+    switch (field) {
+      case 'knowledge':
+        currentValue = selectedKnowledge;
+        break;
+      case 'identity':
+        currentValue = selectedIdentity;
+        break;
+      case 'interest':
+        currentValue = selectedInterest;
+        break;
+      case 'learning':
+        currentValue = selectedLearning;
+        break;
+      case 'gaming':
+        currentValue = selectedGaming;
+        break;
+      case 'historical':
+        currentValue = selectedHistorical;
+        break;
+    }
+
+    return Column(
+      children: options.map((option) {
+        final isSelected = currentValue == option;
+        return Padding(
+          padding: EdgeInsets.only(bottom: 1.h),
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                switch (field) {
+                  case 'knowledge':
+                    selectedKnowledge = option;
+                    break;
+                  case 'identity':
+                    selectedIdentity = option;
+                    break;
+                  case 'interest':
+                    selectedInterest = option;
+                    break;
+                  case 'learning':
+                    selectedLearning = option;
+                    break;
+                  case 'gaming':
+                    selectedGaming = option;
+                    break;
+                  case 'historical':
+                    selectedHistorical = option;
+                    break;
+                }
+              });
+            },
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+              decoration: BoxDecoration(
+                color: isSelected ? const Color(0xFF264653) : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFF264653)
+                      : const Color(0xFF264653).withValues(alpha: 0.2),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Text(
+                option,
+                style: GoogleFonts.inter(
+                  fontSize: 15.sp,
+                  color: isSelected ? Colors.white : const Color(0xFF264653),
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.rtl,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
