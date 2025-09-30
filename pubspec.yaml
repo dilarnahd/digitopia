@@ -38,6 +38,11 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/glyphs/temple_background.svg
+    - assets/glyphs/character.svg
+    - assets/glyphs/life_glyph.svg
+    - assets/glyphs/djed_stability_glyph.svg
+
   # CRITICAL ASSET MANAGEMENT RULES:
   # - DO NOT ADD NEW ASSET DIRECTORIES (assets/svg/, assets/icons/, etc.)
   # - ONLY USE EXISTING AND ITEMS AVAILABLE IN THE DIRECTORIES LISTED ABOVE (assets/, assets/images/)

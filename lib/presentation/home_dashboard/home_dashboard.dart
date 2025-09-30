@@ -80,7 +80,7 @@ void _onNavigationTap(String destination) async {
 
     case 'chatbot':
       final Uri url = Uri.parse(
-          'https://9000-firebase-studio-1759168044857.cluster-lu4mup47g5gm4rtyvhzpwbfadi.cloudworkstations.dev/');
+          'https://www.chatbase.co/wf57UJjvXgYfyHQRSQoiu/help');
       if (await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       } else {

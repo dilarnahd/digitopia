@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart'; 
-import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
@@ -27,8 +25,6 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
   String? selectedLearning;
   String? selectedGaming;
   String? selectedHistorical;
-
-  bool _isLoading = false;
 
   final List<Map<String, dynamic>> egyptianQuestions = [
     {
@@ -131,15 +127,6 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
     }
   }
 
-  bool get _isFormValid {
-    return _nameController.text.trim().isNotEmpty &&
-        selectedAge != null &&
-        selectedLocation != null &&
-        selectedKnowledge != null &&
-        selectedIdentity != null &&
-        selectedInterest != null;
-  }
-
   double get _progressPercentage {
     int answered = 0;
     if (_nameController.text.trim().isNotEmpty) answered++;
@@ -152,31 +139,6 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
     if (selectedGaming != null) answered++;
     if (selectedHistorical != null) answered++;
     return answered / egyptianQuestions.length;
-  }
-
-  int _getAgeValue(String ageRange) {
-    switch (ageRange) {
-      case '١٠–١٣':
-        return 12;
-      case '١٤–١٦':
-        return 15;
-      case '١٧–١٩':
-        return 18;
-      case '٢٠+':
-        return 25;
-      default:
-        return 15;
-    }
-  }
-
-  void _showValidationMessage() {
-    Fluttertoast.showToast(
-      msg: 'من فضلك اجب على جميع الأسئلة',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: AppTheme.lightTheme.colorScheme.error,
-      textColor: Colors.white,
-    );
   }
 
   @override
@@ -205,7 +167,7 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withAlpha(25),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -228,7 +190,7 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
                           width: double.infinity,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withAlpha(76),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: LinearProgressIndicator(
@@ -267,7 +229,8 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const OnboardingVideoScreen(),
+                                  builder: (context) =>
+                                      const OnboardingVideoScreen(),
                                 ),
                               );
                             },
@@ -337,12 +300,12 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF264653).withOpacity(0.2),
+          color: const Color(0xFF264653).withAlpha(51),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(13),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -390,12 +353,12 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF264653).withOpacity(0.2),
+          color: const Color(0xFF264653).withAlpha(51),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(13),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -501,12 +464,12 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
                 border: Border.all(
                   color: isSelected
                       ? const Color(0xFF264653)
-                      : const Color(0xFF264653).withOpacity(0.2),
+                      : const Color(0xFF264653).withAlpha(51),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withAlpha(13),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),

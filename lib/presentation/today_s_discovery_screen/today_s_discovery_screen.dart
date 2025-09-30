@@ -1,3 +1,4 @@
+import 'package:egyptquest/presentation/today_s_discovery_screen/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
@@ -5,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../core/app_export.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/custom_icon_widget.dart';
+import 'game.dart'; // Import the mini-game screen
 
 class TodaySDiscoveryScreen extends StatefulWidget {
   const TodaySDiscoveryScreen({super.key});
@@ -15,8 +17,6 @@ class TodaySDiscoveryScreen extends StatefulWidget {
 
 class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
     with TickerProviderStateMixin {
-  bool _isPlaying = false;
-
   // Mock discovery data
   final Map<String, dynamic> _discoveryData = {
     "id": 1,
@@ -29,29 +29,6 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
 
   void _onBackPressed() {
     Navigator.pop(context);
-  }
-
-  void _onPlayPressed() {
-    HapticFeedback.mediumImpact();
-    setState(() {
-      _isPlaying = !_isPlaying;
-    });
-
-    // Show play confirmation
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          _isPlaying ? 'بدء تشغيل الفيديو' : 'إيقاف تشغيل الفيديو',
-          style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
-            color: AppTheme.lightTheme.colorScheme.onSurface,
-          ),
-        ),
-        backgroundColor: const Color(0xFF264653),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 2),
-      ),
-    );
   }
 
   @override
@@ -88,7 +65,7 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                               decoration: BoxDecoration(
                                 color: const Color(
                                   0xFFD4AF37,
-                                ).withValues(alpha: 0.2),
+                                ).withOpacity(0.2),
                                 shape: BoxShape.circle,
                               ),
                               child: const Center(
@@ -158,7 +135,7 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                               BoxShadow(
                                 color: const Color(
                                   0xFF264653,
-                                ).withValues(alpha: 0.3),
+                                ).withOpacity(0.3),
                                 blurRadius: 15,
                                 offset: const Offset(0, 8),
                               ),
@@ -183,7 +160,7 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                                       decoration: BoxDecoration(
                                         color: const Color(
                                           0xFF264653,
-                                        ).withValues(alpha: 0.1),
+                                        ).withOpacity(0.1),
                                         shape: BoxShape.circle,
                                       ),
                                       child: const Center(
@@ -223,7 +200,7 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                                       decoration: BoxDecoration(
                                         color: const Color(
                                           0xFFD4AF37,
-                                        ).withValues(alpha: 0.2),
+                                        ).withOpacity(0.2),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Text(
@@ -261,7 +238,7 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                               BoxShadow(
                                 color: const Color(
                                   0xFF264653,
-                                ).withValues(alpha: 0.2),
+                                ).withOpacity(0.2),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -307,27 +284,31 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                                       height: 1.6,
                                       fontSize: 13.sp, // Increased size
                                     ),
-                                // Removed maxLines and overflow to show full content
                               ),
                             ],
                           ),
                         ),
 
-                        // Add proper spacing between text container and button
-                        SizedBox(height: 6.h), // Increased spacing
-                        // Play button - Made bigger text
+                        SizedBox(height: 6.h),
+
+                        // New Play Button: العب و افهم
                         GestureDetector(
-                          onTap: _onPlayPressed,
+                          onTap: () {
+                            HapticFeedback.mediumImpact();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const GameScreen()),
+                            );
+                          },
                           child: Container(
                             width: 60.w,
                             height: 7.h,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  const Color(0xFFD4AF37), // Egyptian gold
-                                  const Color(
-                                    0xFFD4AF37,
-                                  ).withValues(alpha: 0.8),
+                                  const Color(0xFFD4AF37),
+                                  const Color(0xFFD4AF37).withOpacity(0.8),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -335,42 +316,26 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                               borderRadius: BorderRadius.circular(35),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(
-                                    0xFFD4AF37,
-                                  ).withValues(alpha: 0.4),
+                                  color: const Color(0xFFD4AF37).withOpacity(0.4),
                                   blurRadius: 15,
                                   offset: const Offset(0, 6),
                                 ),
                               ],
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CustomIconWidget(
-                                  iconName: _isPlaying ? 'pause' : 'play_arrow',
+                            child: Center(
+                              child: Text(
+                                'العب و افهم',
+                                style: AppTheme.lightTheme.textTheme.labelLarge
+                                    ?.copyWith(
                                   color: const Color(0xFF264653),
-                                  size: 24,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14.sp,
                                 ),
-                                SizedBox(width: 2.w),
-                                Text(
-                                  _isPlaying ? 'إيقاف' : 'تشغيل الفيديو',
-                                  style: AppTheme
-                                      .lightTheme
-                                      .textTheme
-                                      .labelLarge
-                                      ?.copyWith(
-                                        color: const Color(0xFF264653),
-                                        fontWeight: FontWeight.w700,
-                                        fontSize:
-                                            14.sp, // Increased button text size
-                                      ),
-                                ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
 
-                        // Bottom spacing for scroll
                         SizedBox(height: 4.h),
                       ],
                     ),
