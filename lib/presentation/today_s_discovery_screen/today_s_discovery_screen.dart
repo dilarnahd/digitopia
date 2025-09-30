@@ -2,11 +2,12 @@ import 'package:egyptquest/presentation/today_s_discovery_screen/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../core/app_export.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/custom_icon_widget.dart';
-import 'game.dart'; // Import the mini-game screen
+import 'game.dart';
 
 class TodaySDiscoveryScreen extends StatefulWidget {
   const TodaySDiscoveryScreen({super.key});
@@ -24,11 +25,38 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
     "subtitle": "معجزة الهندسة المصرية القديمة",
     "content":
         "اكتشف أسرار بناء الهرم الأكبر وكيف استطاع المصريون القدماء بناء هذا الصرح العظيم بدقة هندسية مذهلة تحير العلماء حتى اليوم. استخدموا تقنيات متطورة ونظم معقدة من المنحدرات والبكرات.",
-    "videoUrl": "https://example.com/pyramid-video.mp4",
+    "videoUrl": "assets/glyphs/glyphs_video.mp4", // Local asset
   };
+
+  late VideoPlayerController _videoController;
+  bool _isVideoInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _videoController =
+        VideoPlayerController.asset(_discoveryData['videoUrl'])
+          ..initialize().then((_) {
+            setState(() {
+              _isVideoInitialized = true;
+            });
+          });
+  }
+
+  @override
+  void dispose() {
+    _videoController.dispose();
+    super.dispose();
+  }
 
   void _onBackPressed() {
     Navigator.pop(context);
+  }
+
+  void _playVideo() {
+    if (_isVideoInitialized) {
+      _videoController.play();
+    }
   }
 
   @override
@@ -36,7 +64,7 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFE5C687), // Light golden background
+        backgroundColor: const Color(0xFFE5C687),
         body: SafeArea(
           child: Column(
             children: [
@@ -44,7 +72,7 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
               Container(
                 width: double.infinity,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF264653), // Deep teal
+                  color: Color(0xFF264653),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(40),
                     bottomRight: Radius.circular(40),
@@ -63,9 +91,7 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                               width: 12.w,
                               height: 12.w,
                               decoration: BoxDecoration(
-                                color: const Color(
-                                  0xFFD4AF37,
-                                ).withOpacity(0.2),
+                                color: const Color(0xFFD4AF37).withOpacity(0.2),
                                 shape: BoxShape.circle,
                               ),
                               child: const Center(
@@ -80,31 +106,25 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                           const Spacer(),
                         ],
                       ),
-
                       SizedBox(height: 3.h),
-
-                      // Main title - Made bigger
                       Text(
                         'اكتشاف اليوم!',
                         style: AppTheme.lightTheme.textTheme.headlineMedium
                             ?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
-                              fontSize: 22.sp, // Increased size
+                              fontSize: 22.sp,
                             ),
                         textAlign: TextAlign.center,
                       ),
-
                       SizedBox(height: 2.h),
-
-                      // Welcome message - Made bigger
                       Text(
                         'اكتشف أسرارًا جديدة من حضارتك العريقة',
                         style: AppTheme.lightTheme.textTheme.bodyLarge
                             ?.copyWith(
                               color: Colors.white70,
                               height: 1.4,
-                              fontSize: 14.sp, // Increased size
+                              fontSize: 14.sp,
                             ),
                         textAlign: TextAlign.center,
                       ),
@@ -113,29 +133,26 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                 ),
               ),
 
-              // Make main content scrollable
+              // Main content scrollable
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 6.w,
-                      vertical: 4.h,
-                    ),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
                     child: Column(
                       children: [
-                        // Phone device container
+                        // Phone device container with video
                         Container(
                           width: 70.w,
                           height: 45.h,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF264653), // Dark phone frame
+                            color: const Color(0xFF264653),
                             borderRadius: BorderRadius.circular(25),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(
-                                  0xFF264653,
-                                ).withOpacity(0.3),
+                                color:
+                                    const Color(0xFF264653).withOpacity(0.3),
                                 blurRadius: 15,
                                 offset: const Offset(0, 8),
                               ),
@@ -145,7 +162,7 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                             padding: EdgeInsets.all(2.w),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white, // White screen
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Padding(
@@ -153,66 +170,65 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    // Content preview icon
-                                    Container(
-                                      width: 20.w,
-                                      height: 20.w,
-                                      decoration: BoxDecoration(
-                                        color: const Color(
-                                          0xFF264653,
-                                        ).withOpacity(0.1),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Center(
-                                        child: CustomIconWidget(
-                                          iconName: 'play_circle_filled',
-                                          color: Color(0xFF264653),
-                                          size: 40,
-                                        ),
-                                      ),
+                                    // Video player / play button
+                                    GestureDetector(
+                                      onTap: _playVideo,
+                                      child: _isVideoInitialized
+                                          ? AspectRatio(
+                                              aspectRatio:
+                                                  _videoController.value
+                                                      .aspectRatio,
+                                              child: VideoPlayer(_videoController),
+                                            )
+                                          : Container(
+                                              width: 20.w,
+                                              height: 20.w,
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFF264653)
+                                                    .withOpacity(0.1),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Center(
+                                                child: CustomIconWidget(
+                                                  iconName: 'play_circle_filled',
+                                                  color: Color(0xFF264653),
+                                                  size: 40,
+                                                ),
+                                              ),
+                                            ),
                                     ),
 
                                     SizedBox(height: 3.h),
-
-                                    // Arabic content text - Made bigger
                                     Text(
                                       'الاخر ج',
-                                      style: AppTheme
-                                          .lightTheme
-                                          .textTheme
+                                      style: AppTheme.lightTheme.textTheme
                                           .headlineSmall
                                           ?.copyWith(
                                             color: const Color(0xFF264653),
                                             fontWeight: FontWeight.w600,
-                                            fontSize: 18.sp, // Increased size
+                                            fontSize: 18.sp,
                                           ),
                                       textAlign: TextAlign.center,
                                     ),
 
                                     SizedBox(height: 2.h),
 
-                                    // Video duration indicator - Made bigger
                                     Container(
                                       padding: EdgeInsets.symmetric(
-                                        horizontal: 3.w,
-                                        vertical: 1.h,
-                                      ),
+                                          horizontal: 3.w, vertical: 1.h),
                                       decoration: BoxDecoration(
-                                        color: const Color(
-                                          0xFFD4AF37,
-                                        ).withOpacity(0.2),
+                                        color: const Color(0xFFD4AF37)
+                                            .withOpacity(0.2),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Text(
                                         '5:30 دقيقة',
-                                        style: AppTheme
-                                            .lightTheme
-                                            .textTheme
+                                        style: AppTheme.lightTheme.textTheme
                                             .bodyMedium
                                             ?.copyWith(
                                               color: const Color(0xFF264653),
                                               fontWeight: FontWeight.w500,
-                                              fontSize: 12.sp, // Increased size
+                                              fontSize: 12.sp,
                                             ),
                                       ),
                                     ),
@@ -225,20 +241,17 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
 
                         SizedBox(height: 4.h),
 
-                        // Colored container for text content
+                        // Text content container
                         Container(
                           width: double.infinity,
                           padding: EdgeInsets.all(4.w),
                           decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF264653,
-                            ), // Dark teal container
+                            color: const Color(0xFF264653),
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(
-                                  0xFF264653,
-                                ).withOpacity(0.2),
+                                color:
+                                    const Color(0xFF264653).withOpacity(0.2),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -247,42 +260,33 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Title - Made bigger
                               Text(
                                 _discoveryData['title'] as String,
                                 style: AppTheme.lightTheme.textTheme.titleLarge
                                     ?.copyWith(
-                                      color: const Color(
-                                        0xFFD4AF37,
-                                      ), // Golden title
+                                      color: const Color(0xFFD4AF37),
                                       fontWeight: FontWeight.w700,
-                                      fontSize: 18.sp, // Increased size
+                                      fontSize: 18.sp,
                                     ),
                               ),
-
                               SizedBox(height: 1.h),
-
-                              // Subtitle - Made bigger
                               Text(
                                 _discoveryData['subtitle'] as String,
                                 style: AppTheme.lightTheme.textTheme.bodyLarge
                                     ?.copyWith(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w500,
-                                      fontSize: 14.sp, // Increased size
+                                      fontSize: 14.sp,
                                     ),
                               ),
-
                               SizedBox(height: 2.h),
-
-                              // Content description - Made bigger and removed maxLines
                               Text(
                                 _discoveryData['content'] as String,
                                 style: AppTheme.lightTheme.textTheme.bodyMedium
                                     ?.copyWith(
                                       color: Colors.white70,
                                       height: 1.6,
-                                      fontSize: 13.sp, // Increased size
+                                      fontSize: 13.sp,
                                     ),
                               ),
                             ],
@@ -291,7 +295,7 @@ class _TodaySDiscoveryScreenState extends State<TodaySDiscoveryScreen>
 
                         SizedBox(height: 6.h),
 
-                        // New Play Button: العب و افهم
+                        // Play game button
                         GestureDetector(
                           onTap: () {
                             HapticFeedback.mediumImpact();
