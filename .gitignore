@@ -19,9 +19,7 @@ pubspec.lock
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
+# VS Code folder (optional)
 #.vscode/
 
 # Flutter/Dart/Pub related
@@ -35,13 +33,23 @@ pubspec.lock
 /build/
 /web/
 
+# Dart/JS generated files
+.packages
+.env*
+*.dart.js
+*.info.json
+*.js
+*.js_
+*.js.deps
+*.js.map
+
 # Symbolication related
 app.*.symbols
 
 # Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
+# Android Studio build folders
 /android/app/debug
 /android/app/profile
 /android/app/release
