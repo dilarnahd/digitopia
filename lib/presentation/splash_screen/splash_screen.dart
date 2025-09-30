@@ -1,10 +1,9 @@
+
 import 'package:egyptquest/core/app_export.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 import '../../services/supabase_service.dart';
-
-
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -33,19 +32,16 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _initializeAnimations() {
-    // Logo animation controller
     _logoAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
 
-    // Screen fade animation controller
     _fadeAnimationController = AnimationController(
       duration: const Duration(milliseconds: 240),
       vsync: this,
     );
 
-    // Logo scale animation
     _logoScaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(
         parent: _logoAnimationController,
@@ -53,7 +49,6 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    // Logo fade animation
     _logoFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _logoAnimationController,
@@ -61,7 +56,6 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    // Screen fade animation
     _screenFadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _fadeAnimationController,
@@ -69,13 +63,12 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    // Start logo animation
     _logoAnimationController.forward();
   }
 
   Future<void> _initializeApp() async {
     try {
-      // Simulate initialization tasks
+      // Keep all initialization tasks intact
       await Future.wait([
         _checkAuthenticationStatus(),
         _loadArabicFontAssets(),
@@ -87,11 +80,10 @@ class _SplashScreenState extends State<SplashScreen>
         _isInitialized = true;
       });
 
-      // Wait for minimum splash duration
       await Future.delayed(const Duration(milliseconds: 2000));
 
       if (mounted) {
-        _navigateToNextScreen();
+        _navigateToLogin();
       }
     } catch (e) {
       setState(() {
@@ -99,7 +91,6 @@ class _SplashScreenState extends State<SplashScreen>
         _errorMessage = 'فشل في تحميل التطبيق. يرجى المحاولة مرة أخرى.';
       });
 
-      // Show retry option after 5 seconds
       Future.delayed(const Duration(seconds: 5), () {
         if (mounted && _hasError) {
           _showRetryOption();
@@ -109,102 +100,67 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _checkAuthenticationStatus() async {
-    // Simulate checking authentication status
     await Future.delayed(const Duration(milliseconds: 500));
   }
 
   Future<void> _loadArabicFontAssets() async {
-    // Simulate loading Arabic font assets
     await Future.delayed(const Duration(milliseconds: 300));
   }
 
   Future<void> _fetchDailyDiscoveryContent() async {
-    // Simulate fetching daily discovery content
     await Future.delayed(const Duration(milliseconds: 800));
   }
 
   Future<void> _prepareCachedCulturalData() async {
-    // Simulate preparing cached cultural data
     await Future.delayed(const Duration(milliseconds: 400));
   }
 
-Future<void> _navigateToNextScreen() async {
-  // Check authentication
-  final user = SupabaseService.instance.client.auth.currentUser;
-
-  if (user == null) {
-    // No logged in user → go to Login
+  Future<void> _navigateToLogin() async {
+    // Always navigate to login screen
     Navigator.pushReplacementNamed(context, AppRoutes.login);
-    return;
   }
-
-  // Check if player info exists
-  final profile = await SupabaseService.instance.getUserProfile();
-  final bool isProfileIncomplete =
-      profile == null || profile['profile_completed'] == false;
-
-  if (isProfileIncomplete) {
-    // Player info not filled → go to Player Info screen
-    Navigator.pushReplacementNamed(context, AppRoutes.playerInfoCollection);
-    return;
-  }
-
-  // Check if first time for onboarding
-  final bool isFirstTime = profile['is_first_time'] ?? true;
-  if (isFirstTime) {
-    Navigator.pushReplacementNamed(context, AppRoutes.onboardingVideo);
-    return;
-  }
-
-  // Else go to Home
-  Navigator.pushReplacementNamed(context, AppRoutes.homeDashboard);
-}
-
-
-
 
   void _showRetryOption() {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: const Color(0xFF264653),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: const BorderSide(color: Color(0xFFD4AF37), width: 1),
-            ),
-            title: const Text(
-              'خطأ في التحميل',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            content: Text(
-              _errorMessage,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-              textAlign: TextAlign.center,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  setState(() {
-                    _hasError = false;
-                    _isInitialized = false;
-                  });
-                  _initializeApp();
-                },
-                child: const Text(
-                  'إعادة المحاولة',
-                  style: TextStyle(color: Color(0xFFD4AF37)),
-                ),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF264653),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Color(0xFFD4AF37), width: 1),
+        ),
+        title: const Text(
+          'خطأ في التحميل',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+          _errorMessage,
+          style: const TextStyle(color: Colors.white, fontSize: 14),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              setState(() {
+                _hasError = false;
+                _isInitialized = false;
+              });
+              _initializeApp();
+            },
+            child: const Text(
+              'إعادة المحاولة',
+              style: TextStyle(color: Color(0xFFD4AF37)),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -241,18 +197,10 @@ Future<void> _navigateToNextScreen() async {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Spacer to push content to center
                         const Spacer(flex: 2),
-
-                        // Logo section
                         _buildLogoSection(),
-
                         SizedBox(height: 8.h),
-
-                        // Loading indicator
                         _buildLoadingIndicator(),
-
-                        // Spacer to maintain center alignment
                         const Spacer(flex: 3),
                       ],
                     ),
@@ -276,7 +224,6 @@ Future<void> _navigateToNextScreen() async {
             opacity: _logoFadeAnimation.value,
             child: Column(
               children: [
-                // App logo from assets
                 Container(
                   width: 30.w,
                   height: 30.w,
@@ -313,10 +260,7 @@ Future<void> _navigateToNextScreen() async {
                     ),
                   ),
                 ),
-
                 SizedBox(height: 4.h),
-
-                // Arabic slogan
                 const Text(
                   'اللي كان و اللي هيكون',
                   style: TextStyle(
