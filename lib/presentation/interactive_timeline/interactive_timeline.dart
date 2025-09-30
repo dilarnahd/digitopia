@@ -1,6 +1,3 @@
-
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
@@ -23,73 +20,78 @@ class _InteractiveTimelineState extends State<InteractiveTimeline> {
   final ScrollController _scrollController = ScrollController();
   bool _isRefreshing = false;
 
-  // Mock historical eras data in Egyptian Arabic slang
+  // Mock historical eras focused on Egypt
   final List<Map<String, dynamic>> _historicalEras = [
     {
       "id": 1,
-      "title": "أيام الجاهلية",
-      "period": "قبل الإسلام - 622 م",
+      "title": "عصر ما قبل الأسرات",
+      "period": "5000 - 3100 ق.م",
       "description":
-          "دي الأيام اللي كانت قبل الإسلام في جزيرة العرب، كان وقت الشعر والقبائل والتجارة",
-      "keyEvents": ["سوق عكاظ", "حرب البسوس", "حلف الفضول"],
+          "العصور اللي قبل توحيد مصر، ظهور القرى الأولى والزراعة على ضفاف النيل",
+      "keyEvents": ["الاستيطان على النيل", "تطور الفخار", "الكتابة المبكرة"],
       "color": "#264653",
     },
     {
       "id": 2,
-      "title": "عصر الرسالة",
-      "period": "622 - 632 م",
+      "title": "العصر الفرعوني المبكر",
+      "period": "3100 - 2686 ق.م",
       "description":
-          "هنا بدأ الإسلام ونزل القرآن على سيدنا محمد صلى الله عليه وسلم",
-      "keyEvents": ["هجرة النبي", "غزوة بدر", "فتح مكة"],
+          "توحيد مصر العليا والسفلى وبدء الأسرات الأولى، ظهور الأهرامات الأولى",
+      "keyEvents": ["توحيد مصر", "أول ملوك مصر", "بناء المقابر الأولى"],
       "color": "#264653",
     },
     {
       "id": 3,
-      "title": "الخلفا الراشدين",
-      "period": "632 - 661 م",
+      "title": "العصر القديم",
+      "period": "2686 - 2181 ق.م",
       "description":
-          "دي فترة الخلفا الأربعة الراشدين ولما توسعت الدولة الإسلامية",
-      "keyEvents": ["خلافة أبو بكر", "الفتوحات الإسلامية", "جمع القرآن"],
+          "عصر بناء الأهرامات والمعابد، ازدهار الدولة القديمة وقوة الفراعنة",
+      "keyEvents": ["بناء الهرم الأكبر", "الهرم الزقزاقي", "تطوير النقوش الهيروغليفية"],
       "color": "#264653",
     },
     {
       "id": 4,
-      "title": "الدولة الأموية",
-      "period": "661 - 750 م",
-      "description": "الأمويين نقلوا العاصمة لدمشق والإمبراطورية بقت أكبر",
-      "keyEvents": ["معاوية بن أبي سفيان", "فتح الأندلس", "قبة الصخرة"],
+      "title": "العصر الوسيط",
+      "period": "2055 - 1650 ق.م",
+      "description":
+          "فترة استقرار وازدهار بعد انهيار الدولة القديمة، مع تطوير الفنون والكتابة",
+      "keyEvents": ["بناء المعابد", "الفن الأدبي", "التحكم في النيل"],
       "color": "#264653",
     },
     {
       "id": 5,
-      "title": "العصر العباسي",
-      "period": "750 - 1258 م",
-      "description": "دي الأيام الحلوة للحضارة الإسلامية وبغداد بقت العاصمة",
-      "keyEvents": ["بيت الحكمة", "هارون الرشيد", "ترجمة العلوم"],
+      "title": "العصر الحديث",
+      "period": "1550 - 1070 ق.م",
+      "description":
+          "أشهر الفراعنة مثل تحتمس الثالث ورمسيس الثاني، توسع الإمبراطورية المصرية",
+      "keyEvents": ["الفتح العسكري", "بناء المعابد الكبرى", "الكتابة الهيروغليفية"],
       "color": "#264653",
     },
     {
       "id": 6,
-      "title": "الدول المستقلة",
-      "period": "900 - 1500 م",
-      "description": "طلعت دول مستقلة في أماكن مختلفة في العالم الإسلامي",
-      "keyEvents": ["الدولة الفاطمية", "الدولة الأيوبية", "المماليك"],
+      "title": "العصر المتأخر",
+      "period": "664 - 332 ق.م",
+      "description":
+          "انحدار الدولة المصرية القديمة وظهور الاحتلالات الأجنبية مثل الفرس",
+      "keyEvents": ["حكم الفرس", "الثقافة والفن المتأخر", "المعارك الداخلية"],
       "color": "#264653",
     },
     {
       "id": 7,
-      "title": "العثمانليين",
-      "period": "1299 - 1922 م",
-      "description": "الإمبراطورية العثمانية وحدت معظم العالم الإسلامي",
-      "keyEvents": ["فتح القسطنطينية", "سليمان القانوني", "الخلافة العثمانية"],
+      "title": "العصر البطلمي",
+      "period": "332 - 30 ق.م",
+      "description":
+          "حكم الإسكندر الأكبر ثم البطالمة، روعة فنون الهيلينستيك في مصر",
+      "keyEvents": ["الإسكندر الأكبر", "حكم البطالمة", "مكتبة الإسكندرية"],
       "color": "#264653",
     },
     {
       "id": 8,
-      "title": "العصر الجديد",
-      "period": "1800 - دلوقتي",
-      "description": "النهضة العربية الاستقلال وإنشاء الدول الحديثة",
-      "keyEvents": ["النهضة العربية", "الاستقلال", "جامعة الدول العربية"],
+      "title": "العصر الروماني والقبطي",
+      "period": "30 ق.م - 641 م",
+      "description":
+          "سيطرة الرومان ثم ظهور المسيحية، بداية العصر القبطي في مصر",
+      "keyEvents": ["الحكم الروماني", "انتشار المسيحية", "الفن القبطي"],
       "color": "#264653",
     },
   ];
@@ -100,20 +102,11 @@ class _InteractiveTimelineState extends State<InteractiveTimeline> {
     super.dispose();
   }
 
-  /// Handle pull-to-refresh functionality
+  /// Pull-to-refresh
   Future<void> _handleRefresh() async {
-    setState(() {
-      _isRefreshing = true;
-    });
-
-    // Simulate content refresh
+    setState(() => _isRefreshing = true);
     await Future.delayed(const Duration(seconds: 1));
-
-    setState(() {
-      _isRefreshing = false;
-    });
-
-    // Show refresh feedback
+    setState(() => _isRefreshing = false);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -129,12 +122,9 @@ class _InteractiveTimelineState extends State<InteractiveTimeline> {
     }
   }
 
-  /// Handle timeline block navigation
+  /// Handle block navigation
   void _handleBlockNavigation(Map<String, dynamic> eraData) {
-    // Haptic feedback for iOS
     HapticFeedback.lightImpact();
-
-    // Show era details in bottom sheet
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -143,107 +133,80 @@ class _InteractiveTimelineState extends State<InteractiveTimeline> {
     );
   }
 
-  /// Build era details bottom sheet
+  /// Bottom sheet
   Widget _buildEraDetailsSheet(Map<String, dynamic> eraData) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Container(
       height: 70.h,
       decoration: BoxDecoration(
-        color: isDark
-            ? AppTheme.darkTheme.colorScheme.surface
-            : AppTheme.lightTheme.colorScheme.surface,
+        color: const Color(0xFFE5C678),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         children: [
-          // Handle bar
           Container(
             margin: EdgeInsets.only(top: 1.h),
             width: 12.w,
             height: 0.5.h,
             decoration: BoxDecoration(
-              color: isDark
-                  ? AppTheme.textSecondaryDark
-                  : AppTheme.textSecondaryLight,
+              color: const Color(0xFF264653),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
-          // Content
           Expanded(
             child: Padding(
               padding: EdgeInsets.all(4.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // Title
                   Text(
-                    (eraData['title'] as String?) ?? '',
-                    style: theme.textTheme.headlineMedium?.copyWith(
+                    eraData['title'] ?? '',
+                    style: TextStyle(
                       fontSize: 22.sp,
                       fontWeight: FontWeight.w700,
+                      color: const Color(0xFF264653),
                     ),
                     textDirection: TextDirection.rtl,
                   ),
-
                   SizedBox(height: 1.h),
-
-                  // Period
                   Text(
-                    (eraData['period'] as String?) ?? '',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: isDark
-                          ? AppTheme.textSecondaryDark
-                          : AppTheme.textSecondaryLight,
+                    eraData['period'] ?? '',
+                    style: TextStyle(
                       fontSize: 16.sp,
+                      color: const Color(0xFF264653),
                     ),
                     textDirection: TextDirection.rtl,
                   ),
-
                   SizedBox(height: 3.h),
-
-                  // Description
                   Text(
-                    (eraData['description'] as String?) ?? '',
-                    style: theme.textTheme.bodyLarge?.copyWith(
+                    eraData['description'] ?? '',
+                    style: TextStyle(
                       fontSize: 16.sp,
                       height: 1.6,
+                      color: const Color(0xFF264653),
                     ),
                     textDirection: TextDirection.rtl,
                   ),
-
                   SizedBox(height: 3.h),
-
-                  // Key events
                   Text(
                     'الأحداث الرئيسية:',
-                    style: theme.textTheme.titleLarge?.copyWith(
+                    style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w600,
+                      color: const Color(0xFF264653),
                     ),
                     textDirection: TextDirection.rtl,
                   ),
-
                   SizedBox(height: 2.h),
-
-                  // Events list
                   Expanded(
                     child: ListView.builder(
-                      itemCount: ((eraData['keyEvents'] as List?)?.length ?? 0),
+                      itemCount: (eraData['keyEvents'] as List?)?.length ?? 0,
                       itemBuilder: (context, index) {
-                        final event =
-                            (eraData['keyEvents'] as List)[index] as String;
+                        final event = (eraData['keyEvents'] as List)[index];
                         return Container(
                           margin: EdgeInsets.only(bottom: 1.h),
                           padding: EdgeInsets.all(3.w),
                           decoration: BoxDecoration(
-                            color: (isDark
-                                    ? AppTheme
-                                        .darkTheme.colorScheme.primaryContainer
-                                    : AppTheme.lightTheme.colorScheme.primary)
-                                .withValues(alpha: 0.1),
+                            color: const Color(0xFF264653).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -251,8 +214,9 @@ class _InteractiveTimelineState extends State<InteractiveTimeline> {
                               Expanded(
                                 child: Text(
                                   event,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                  style: TextStyle(
                                     fontSize: 14.sp,
+                                    color: const Color(0xFF264653),
                                   ),
                                   textDirection: TextDirection.rtl,
                                 ),
@@ -260,8 +224,7 @@ class _InteractiveTimelineState extends State<InteractiveTimeline> {
                               SizedBox(width: 2.w),
                               CustomIconWidget(
                                 iconName: 'circle',
-                                color:
-                                    AppTheme.lightTheme.colorScheme.secondary,
+                                color: const Color(0xFF264653),
                                 size: 8,
                               ),
                             ],
@@ -270,17 +233,20 @@ class _InteractiveTimelineState extends State<InteractiveTimeline> {
                       },
                     ),
                   ),
-
                   SizedBox(height: 2.h),
-
-                  // Close button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF264653),
+                      ),
                       onPressed: () => Navigator.pop(context),
                       child: Text(
                         'إغلاق',
-                        style: TextStyle(fontSize: 16.sp),
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: const Color(0xFFE5C678),
+                        ),
                         textDirection: TextDirection.rtl,
                       ),
                     ),
@@ -296,20 +262,16 @@ class _InteractiveTimelineState extends State<InteractiveTimeline> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFe5c687),
+        backgroundColor: const Color(0xFFE5C678),
         body: RefreshIndicator(
           onRefresh: _handleRefresh,
           color: const Color(0xFF264653),
           child: CustomScrollView(
             controller: _scrollController,
             slivers: [
-              // Curved header
               SliverToBoxAdapter(
                 child: CurvedHeaderWidget(
                   title: 'اكتشف رحلتك عبر التاريخ',
@@ -318,14 +280,11 @@ class _InteractiveTimelineState extends State<InteractiveTimeline> {
                   onBackPressed: () => Navigator.of(context).pop(),
                 ),
               ),
-
-              // Timeline content
               SliverToBoxAdapter(
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 2.w),
                   child: Stack(
                     children: [
-                      // Central continuous line
                       Positioned(
                         left: 50.w - 2,
                         top: 0,
@@ -333,14 +292,11 @@ class _InteractiveTimelineState extends State<InteractiveTimeline> {
                           height: (_historicalEras.length * 20.h) + 10.h,
                         ),
                       ),
-
-                      // Timeline blocks
                       Column(
                         children: _historicalEras.asMap().entries.map((entry) {
                           final index = entry.key;
                           final era = entry.value;
                           final isLeftAligned = index % 2 == 0;
-
                           return TimelineBlockWidget(
                             eraData: era,
                             isLeftAligned: isLeftAligned,
@@ -352,8 +308,6 @@ class _InteractiveTimelineState extends State<InteractiveTimeline> {
                   ),
                 ),
               ),
-
-              // Bottom spacing
               SliverToBoxAdapter(child: SizedBox(height: 5.h)),
             ],
           ),

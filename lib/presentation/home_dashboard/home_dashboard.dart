@@ -1,14 +1,14 @@
+import 'package:egyptquest/presentation/library_screen/library-screen.dart';
+import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
+import 'package:video_player/video_player.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../library_screen/Library-screen.dart';
-
 import 'package:egyptquest/presentation/interactive_timeline/interactive_timeline.dart';
-
-import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
-
 import '../../core/app_export.dart';
-import '../../services/supabase_service.dart';
+import '../../theme/app_theme.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({super.key});
@@ -17,43 +17,31 @@ class HomeDashboard extends StatefulWidget {
   State<HomeDashboard> createState() => _HomeDashboardState();
 }
 
-class _HomeDashboardState extends State<HomeDashboard> {
-  String _playerName = 'ضيف';
+class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateMixin {
   bool _hasStartedJourney = false;
-  final SupabaseService _supabaseService = SupabaseService.instance;
-  bool _isLoading = true;
+  bool _isLoading = false;
+
+  late VideoPlayerController _videoController;
+  bool _isVideoInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _loadPlayerData();
-  }
 
-  Future<void> _loadPlayerData() async {
-    try {
-      final name = await _supabaseService.getPlayerName();
-      final journeyStarted = await _supabaseService.hasUserStartedJourney();
-
-      if (mounted) {
+    // Initialize the home video from assets
+    _videoController = VideoPlayerController.asset('assets/videos/home_video.mp4')
+      ..initialize().then((_) {
         setState(() {
-          _playerName = name;
-          _hasStartedJourney = journeyStarted;
-          _isLoading = false;
+          _isVideoInitialized = true;
+          _videoController.play();
+          // Video does not loop
         });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+      });
   }
 
   Future<void> _onJourneyButtonPressed() async {
     try {
       if (!_hasStartedJourney) {
-        await _supabaseService.updateJourneyStatus(true);
         setState(() {
           _hasStartedJourney = true;
         });
@@ -64,43 +52,46 @@ class _HomeDashboardState extends State<HomeDashboard> {
     }
   }
 
-  
-void _onNavigationTap(String destination) async {
-  switch (destination) {
-    case 'library':
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const LibraryScreen()),
-      );
-      break;
+  void _onNavigationTap(String destination) async {
+    switch (destination) {
+      case 'library':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LibraryScreen()),
+        );
+        break;
 
-    case 'discovery':
-      Navigator.pushNamed(context, AppRoutes.todaySDiscovery);
-      break;
+      case 'discovery':
+        Navigator.pushNamed(context, AppRoutes.todaySDiscovery);
+        break;
 
-    case 'chatbot':
-      final Uri url = Uri.parse(
-          'https://www.chatbase.co/wf57UJjvXgYfyHQRSQoiu/help');
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تعذر فتح الرابط')),
-          );
+      case 'chatbot':
+        final Uri url = Uri.parse('https://www.chatbase.co/wf57UJjvXgYfyHQRSQoiu/help');
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('تعذر فتح الرابط')),
+            );
+          }
         }
-      }
-      break;
+        break;
 
-    case 'timeline':
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const InteractiveTimeline()),
-      );
-      break;
+      case 'timeline':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const InteractiveTimeline()),
+        );
+        break;
+    }
   }
-}
 
+  @override
+  void dispose() {
+    _videoController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +110,7 @@ void _onNavigationTap(String destination) async {
       backgroundColor: AppTheme.secondaryLight,
       body: Column(
         children: [
-          // Top curved section with player/settings buttons and welcome message
+          // Top curved section without buttons
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -134,61 +125,11 @@ void _onNavigationTap(String destination) async {
                 padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
                 child: Column(
                   children: [
-                    // Top buttons row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Player button
-                        GestureDetector(
-                          onTap: () {
-                            // Navigate to player account screen
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('حساب اللاعب قريبًا')),
-                            );
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(3.w),
-                            decoration: BoxDecoration(
-                              color: AppTheme.accentLight,
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Icon(
-                              Icons.person,
-                              color: AppTheme.primaryLight,
-                              size: 6.w,
-                            ),
-                          ),
-                        ),
-                        // Settings button
-                        GestureDetector(
-                          onTap: () {
-                            // Navigate to settings screen
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('الإعدادات قريبًا')),
-                            );
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(3.w),
-                            decoration: BoxDecoration(
-                              color: AppTheme.accentLight,
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Icon(
-                              Icons.settings,
-                              color: AppTheme.primaryLight,
-                              size: 6.w,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    SizedBox(height: 2.h), // Space at top
 
-                    SizedBox(height: 4.h),
-
-                    // Welcome message
+                    // Welcome message without Guest
                     Text(
-                      'اهلا بيك $_playerName في رحلتك لاكتشاف حضارتك . أصلك و تاريخك',
+                      'اهلا بيك في رحلتك لاكتشاف حضارتك. أصلك و تاريخك',
                       style: GoogleFonts.inter(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.w600,
@@ -197,45 +138,77 @@ void _onNavigationTap(String destination) async {
                       textAlign: TextAlign.center,
                     ),
 
-                    SizedBox(height: 2.h),
+                    SizedBox(height: 3.h),
                   ],
                 ),
               ),
             ),
           ),
 
+          // Video section
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Big glowing journey button
-                GestureDetector(
-                  onTap: _onJourneyButtonPressed,
-                  child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 6.w),
-                    padding:
-                        EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
-                    decoration: BoxDecoration(
-                      color: AppTheme.accentLight,
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.accentLight.withAlpha(102),
-                          blurRadius: 20,
-                          spreadRadius: 5,
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      _hasStartedJourney
-                          ? 'يلا تكمل رحلتك'
-                          : 'أبدأ رحلتك عبر تاريخ مصر',
-                      style: GoogleFonts.inter(
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.primaryLight,
+                // Home video container (square)
+                Container(
+                  width: 70.w,
+                  height: 70.w,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF264653),
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF264653).withOpacity(0.3),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
                       ),
-                      textAlign: TextAlign.center,
+                    ],
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(2.w),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: _isVideoInitialized
+                          ? Stack(
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  child: FittedBox(
+                                    fit: BoxFit.cover,
+                                    child: SizedBox(
+                                      width: _videoController.value.size.width,
+                                      height: _videoController.value.size.height,
+                                      child: VideoPlayer(_videoController),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 10,
+                                  left: 10,
+                                  child: IconButton(
+                                    icon: Icon(
+                                      _videoController.value.isPlaying
+                                          ? Icons.pause
+                                          : Icons.play_arrow,
+                                      color: Colors.white,
+                                      size: 35,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _videoController.value.isPlaying
+                                            ? _videoController.pause()
+                                            : _videoController.play();
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            )
+                          : const Center(
+                              child: CircularProgressIndicator(),
+                            ),
                     ),
                   ),
                 ),
@@ -243,7 +216,40 @@ void _onNavigationTap(String destination) async {
             ),
           ),
 
-          // Bottom curved section with navigation buttons
+          // Big journey button at the bottom
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+            child: GestureDetector(
+              onTap: _onJourneyButtonPressed,
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
+                decoration: BoxDecoration(
+                  color: AppTheme.accentLight,
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.accentLight.withAlpha(102),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Text(
+                  _hasStartedJourney
+                      ? 'يلا تكمل رحلتك'
+                      : 'أبدأ رحلتك عبر تاريخ مصر',
+                  style: GoogleFonts.inter(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.primaryLight,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+
+          // Bottom curved section with navigation buttons slightly lowered
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -254,29 +260,22 @@ void _onNavigationTap(String destination) async {
               ),
             ),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 5.h),
+              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 6.h),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // Library button
                   _buildNavigationButton(
                     icon: Icons.menu_book,
                     onTap: () => _onNavigationTap('library'),
                   ),
-
-                  // Today's discovery button
                   _buildNavigationButton(
                     icon: Icons.auto_awesome,
                     onTap: () => _onNavigationTap('discovery'),
                   ),
-
-                  // Chatbot button
                   _buildNavigationButton(
                     icon: Icons.chat_bubble_outline,
                     onTap: () => _onNavigationTap('chatbot'),
                   ),
-
-                  // Timeline button
                   _buildNavigationButton(
                     icon: Icons.timeline,
                     onTap: () => _onNavigationTap('timeline'),

@@ -43,12 +43,12 @@ class CurvedHeaderWidget extends StatelessWidget {
                   // Top row with back button on the left
                   Row(
                     children: [
-                      // Return button (left side) - Points right for RTL
+                      // Return button (left side) - Points left now
                       IconButton(
                         onPressed:
                             onBackPressed ?? () => Navigator.of(context).pop(),
                         icon: CustomIconWidget(
-                          iconName: 'arrow_forward',
+                          iconName: 'arrow_back', // changed from arrow_forward
                           color: const Color(0xFFe5c687),
                           size: 24,
                         ),
@@ -90,7 +90,7 @@ class CurvedHeaderWidget extends StatelessWidget {
                               subtitle!,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: const Color(0xFFe5c687)
-                                    .withValues(alpha: 0.9),
+                                    .withOpacity(0.9),
                                 fontSize: 14.sp,
                                 height: 1.4,
                               ),

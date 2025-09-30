@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../core/app_export.dart';
@@ -12,20 +13,20 @@ class CharacterCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isLocked = character['isLocked'] ?? false;
+    final String? imageAsset = character['imageAsset'];
 
     return Container(
-      // Remove extra container styling since parent already has dark background
       child: Row(
         textDirection: TextDirection.rtl,
         children: [
-          // Character image
+          // Character image square
           Container(
             width: 20.w,
             height: 20.w,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.2), // Light border
+                color: Colors.white.withOpacity(0.2),
                 width: 1,
               ),
             ),
@@ -33,29 +34,45 @@ class CharacterCardWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: isLocked
                   ? Container(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: Colors.white.withOpacity(0.1),
                       child: Center(
                         child: Icon(
                           Icons.lock_outline,
-                          color: Colors.white.withValues(alpha: 0.7),
+                          color: Colors.white.withOpacity(0.7),
                           size: 24,
                         ),
                       ),
                     )
-                  : CustomImageWidget(
-                      imageUrl: character['imageUrl'] ?? '',
-                      fit: BoxFit.cover,
-                      errorWidget: Container(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        child: Center(
-                          child: Icon(
-                            Icons.person_outline,
-                            color: Colors.white.withValues(alpha: 0.7),
-                            size: 24,
+                  : imageAsset != null && imageAsset.endsWith('.svg')
+                      ? SvgPicture.asset(
+                          imageAsset,
+                          fit: BoxFit.contain,
+                          placeholderBuilder: (context) => Container(
+                            color: Colors.white.withOpacity(0.1),
+                            child: Center(
+                              child: Icon(
+                                Icons.person_outline,
+                                color: Colors.white.withOpacity(0.7),
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Image.asset(
+                          imageAsset ?? '',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                            color: Colors.white.withOpacity(0.1),
+                            child: Center(
+                              child: Icon(
+                                Icons.person_outline,
+                                color: Colors.white.withOpacity(0.7),
+                                size: 24,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
             ),
           ),
 
@@ -71,7 +88,7 @@ class CharacterCardWidget extends StatelessWidget {
                   character['name'] ?? 'غير معروف',
                   textAlign: TextAlign.right,
                   style: AppTheme.lightTheme.textTheme.titleLarge?.copyWith(
-                    color: Colors.white, // White color for dark background
+                    color: Colors.white,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -83,7 +100,7 @@ class CharacterCardWidget extends StatelessWidget {
                   character['era'] ?? 'غير محدد',
                   textAlign: TextAlign.right,
                   style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.8), // Light white
+                    color: Colors.white.withOpacity(0.8),
                   ),
                 ),
 
@@ -94,7 +111,7 @@ class CharacterCardWidget extends StatelessWidget {
                   character['tagline'] ?? '',
                   textAlign: TextAlign.right,
                   style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.7), // Light white
+                    color: Colors.white.withOpacity(0.7),
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -108,7 +125,7 @@ class CharacterCardWidget extends StatelessWidget {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.9), // Light white
+                    color: Colors.white.withOpacity(0.9),
                     height: 1.4,
                   ),
                 ),

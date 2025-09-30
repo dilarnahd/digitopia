@@ -1,364 +1,305 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../core/app_export.dart';
-import './widgets/category_button_widget.dart';
-import './widgets/character_card_widget.dart';
-import './widgets/curved_header_widget.dart';
-import './widgets/shimmer_loading_widget.dart';
-
-class LibraryScreen extends StatefulWidget {
-  const LibraryScreen({Key? key}) : super(key: key);
-
-  @override
-  State<LibraryScreen> createState() => _LibraryScreenState();
-}
-
-class _LibraryScreenState extends State<LibraryScreen> {
-  int _selectedCategoryIndex = 0;
-  bool _isLoading = false;
-
-  final List<Map<String, dynamic>> _categories = [
-    {'title': 'شخصيات', 'isLocked': false},
-    {'title': 'معارك', 'isLocked': false},
-    {'title': 'انجازات', 'isLocked': false},
-    {'title': 'أول-مرة', 'isLocked': false},
-  ];
-
-  final List<Map<String, dynamic>> _charactersData = [
-    {
-      'id': 1,
-      'name': 'أحمد الفرعوني',
-      'era': 'فرعوني',
-      'tagline': 'محارب الصحراء الأسطوري',
-      'description':
-          'محارب شجاع من العصر الفرعوني، يتميز بقوته الخارقة وحكمته في المعارك. قاد العديد من الحملات العسكرية الناجحة وحمى أرض مصر من الغزاة. يحمل سيف الآلهة المقدس ويستطيع استدعاء قوة الشمس في المعارك.',
-      'imageUrl':
-          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-      'isLocked': false,
-    },
-    {
-      'id': 2,
-      'name': 'فاطمة الحكيمة',
-      'era': 'فرعوني',
-      'tagline': 'ساحرة المعابد المقدسة',
-      'description':
-          'كاهنة عظيمة تتقن فنون السحر القديم والشفاء. تحرس أسرار المعابد الفرعونية وتساعد المحاربين بقواها السحرية. تستطيع التحكم في عناصر الطبيعة واستدعاء الحماية الإلهية.',
-      'imageUrl':
-          'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face',
-      'isLocked': false,
-    },
-    {
-      'id': 3,
-      'name': '؟؟؟',
-      'era': 'مقفل — اكتشف في اللعب',
-      'tagline': 'فارغ',
-      'description': 'مقفل — العب اكتر علشان تفتحه',
-      'imageUrl': '',
-      'isLocked': true,
-    },
-    {
-      'id': 4,
-      'name': 'خالد الأسطورة',
-      'era': 'فرعوني',
-      'tagline': 'حامي الكنوز المفقودة',
-      'description':
-          'مستكشف ومغامر يبحث عن الكنوز المفقودة في الأهرامات والمعابد القديمة. يتميز بذكائه الحاد وقدرته على حل الألغاز المعقدة. يحمل خريطة سرية تقوده إلى أعظم الكنوز الفرعونية.',
-      'imageUrl':
-          'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
-      'isLocked': false,
-    },
-  ];
-
-  final List<Map<String, dynamic>> _battlesData = [
-    {
-      'id': 1,
-      'name': 'قريباً',
-      'era': 'المحتوى قيد التطوير',
-      'tagline': 'معارك ملحمية قادمة قريباً',
-      'description':
-          'نحن نعمل على إضافة معارك مثيرة وتحديات ملحمية. ابق متابعاً للحصول على تحديثات حول المعارك القادمة والمغامرات الجديدة.',
-      'imageUrl':
-          'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop',
-      'isLocked': false,
-    },
-  ];
-
-  final List<Map<String, dynamic>> _achievementsData = [
-    {
-      'id': 1,
-      'name': 'قريباً',
-      'era': 'المحتوى قيد التطوير',
-      'tagline': 'انجازات وجوائز قادمة قريباً',
-      'description':
-          'نحن نعمل على إضافة نظام انجازات شامل مع جوائز مثيرة ومكافآت خاصة. ستتمكن قريباً من جمع الانجازات وإفتخار بإنجازاتك في اللعبة.',
-      'imageUrl':
-          'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=400&fit=crop',
-      'isLocked': false,
-    },
-  ];
-
-  final List<Map<String, dynamic>> _firstTimeData = [
-    {
-      'id': 1,
-      'name': 'أول انتصار',
-      'era': 'تجربة أولى',
-      'tagline': 'لحظة النصر الأولى في اللعبة',
-      'description':
-          'تذكر دائماً لحظة انتصارك الأول في اللعبة. كانت معركة صعبة ضد أحد الحراس الفرعونيين، لكنك تمكنت من الفوز باستخدام استراتيجية ذكية وصبر طويل.',
-      'imageUrl':
-          'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=400&fit=crop',
-      'isLocked': false,
-    },
-    {
-      'id': 2,
-      'name': 'اكتشاف أول كنز',
-      'era': 'تجربة أولى',
-      'tagline': 'العثور على الكنز المخفي الأول',
-      'description':
-          'في أعماق الهرم الأكبر، عثرت على أول كنز حقيقي. كان صندوقاً ذهبياً يحتوي على جواهر نادرة وتعويذة سحرية قديمة زادت من قوتك بشكل كبير.',
-      'imageUrl':
-          'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop',
-      'isLocked': false,
-    },
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadContent();
-  }
-
-  Future<void> _loadContent() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simulate loading time
-    await Future.delayed(const Duration(milliseconds: 1500));
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  void _onCategoryTap(int index) {
-    // Remove the lock check since all categories are now unlocked
-    setState(() {
-      _selectedCategoryIndex = index;
-    });
-    _loadContent();
-  }
-
-  List<Map<String, dynamic>> _getCurrentCategoryData() {
-    switch (_selectedCategoryIndex) {
-      case 0:
-        return _charactersData;
-      case 1:
-        return _battlesData;
-      case 2:
-        return _achievementsData;
-      case 3:
-        return _firstTimeData;
-      default:
-        return _charactersData;
-    }
-  }
-
-  void _onProfileTap() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'الملف الشخصي قريباً!',
-          textAlign: TextAlign.right,
-          style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
-            color: AppTheme.lightTheme.colorScheme.onPrimary,
-          ),
-        ),
-        backgroundColor: AppTheme.lightTheme.colorScheme.primary,
-      ),
-    );
-  }
-
-  void _onSettingsTap() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'الإعدادات قريباً!',
-          textAlign: TextAlign.right,
-          style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
-            color: AppTheme.lightTheme.colorScheme.onPrimary,
-          ),
-        ),
-        backgroundColor: AppTheme.lightTheme.colorScheme.primary,
-      ),
-    );
-  }
-
-  void _onHomeTap() {
-    Navigator.of(context).pop();
-  }
+import '../../../core/app_export.dart';
+class LibraryScreen extends StatelessWidget {
+  const LibraryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: const Color(0xFFe5c687), // Light beige/gold background
-        body: Column(
-          children: [
-            // Top curved header with dark teal background
-            CurvedHeaderWidget(onHomeTap: _onHomeTap),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("المكتبة"),
+        centerTitle: true,
+      ),
+      body: ListView.separated(
+        padding: const EdgeInsets.all(16),
+        itemCount: characters.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          final character = characters[index];
+          return Card(
+            color: Colors.black.withOpacity(0.7),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: CharacterCardWidget(character: character),
+            ),
+          );
+        },
+      ),
+      backgroundColor: Colors.black,
+    );
+  }
+}
 
-            // Main content area in light background
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                color: const Color(0xFFe5c687), // Light beige/gold background
-                child: _isLoading
-                    ? const ShimmerLoadingWidget()
-                    : RefreshIndicator(
-                        onRefresh: _loadContent,
-                        color: const Color(0xFF264653),
-                        child: _getCurrentCategoryData().isEmpty
-                            ? Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    CustomIconWidget(
-                                      iconName: 'inbox',
-                                      color: const Color(0xFF264653)
-                                          .withValues(alpha: 0.7),
-                                      size: 48,
-                                    ),
-                                    SizedBox(height: 2.h),
-                                    Text(
-                                      'لا يوجد محتوى متاح حالياً',
-                                      textAlign: TextAlign.right,
-                                      style: AppTheme
-                                          .lightTheme.textTheme.bodyLarge
-                                          ?.copyWith(
-                                        color: const Color(0xFF264653)
-                                            .withValues(alpha: 0.8),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : ListView.builder(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 4.w, vertical: 2.h),
-                                itemCount: _getCurrentCategoryData().length,
-                                itemBuilder: (context, index) {
-                                  return Container(
-                                    margin: EdgeInsets.only(bottom: 2.h),
-                                    padding: EdgeInsets.all(4.w),
-                                    decoration: BoxDecoration(
-                                      color: const Color(
-                                          0xFF264653), // Dark teal background for cards
-                                      borderRadius: BorderRadius.circular(16),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black
-                                              .withValues(alpha: 0.1),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: CharacterCardWidget(
-                                      character:
-                                          _getCurrentCategoryData()[index],
-                                    ),
-                                  );
-                                },
-                              ),
-                      ),
+
+class CharacterCardWidget extends StatelessWidget {
+  final Map<String, dynamic> character;
+
+  const CharacterCardWidget({Key? key, required this.character})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isLocked = character['isLocked'] ?? false;
+    final String? imageAsset = character['imageAsset'];
+
+    return Container(
+      child: Row(
+        textDirection: TextDirection.rtl,
+        children: [
+          // Character image square
+          Container(
+            width: 20.w,
+            height: 20.w,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.2),
+                width: 1,
               ),
             ),
-
-            // Bottom curved section with category buttons
-            Container(
-              height: 20.h,
-              child: Stack(
-                children: [
-                  // Curved background with dark teal color
-                  ClipPath(
-                    clipper: CurvedBottomClipper(),
-                    child: Container(
-                      height: 20.h,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF264653), // Dark teal background
-                      ),
-                    ),
-                  ),
-                  // Category buttons content
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(
-                          _categories.length,
-                          (index) => CategoryButtonWidget(
-                            title: _categories[index]['title'],
-                            isSelected: _selectedCategoryIndex == index,
-                            isLocked: false,
-                            onTap: () => _onCategoryTap(index),
-                          ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: isLocked
+                  ? Container(
+                      color: Colors.white.withOpacity(0.1),
+                      child: Center(
+                        child: Icon(
+                          Icons.lock_outline,
+                          color: Colors.white.withOpacity(0.7),
+                          size: 24,
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
+                    )
+                  : imageAsset != null && imageAsset.endsWith('.svg')
+                      ? SvgPicture.asset(
+                          imageAsset,
+                          fit: BoxFit.contain,
+                          placeholderBuilder: (context) => Container(
+                            color: Colors.white.withOpacity(0.1),
+                            child: Center(
+                              child: Icon(
+                                Icons.person_outline,
+                                color: Colors.white.withOpacity(0.7),
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Image.asset(
+                          imageAsset ?? '',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                            color: Colors.white.withOpacity(0.1),
+                            child: Center(
+                              child: Icon(
+                                Icons.person_outline,
+                                color: Colors.white.withOpacity(0.7),
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                        ),
             ),
-          ],
-        ),
+          ),
+
+          SizedBox(width: 4.w),
+
+          // Character details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                // Name
+                Text(
+                  character['name'] ?? 'غير معروف',
+                  textAlign: TextAlign.right,
+                  style: AppTheme.lightTheme.textTheme.titleLarge?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+
+                SizedBox(height: 1.h),
+
+                // Era
+                Text(
+                  character['era'] ?? 'غير محدد',
+                  textAlign: TextAlign.right,
+                  style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withOpacity(0.8),
+                  ),
+                ),
+
+                SizedBox(height: 0.5.h),
+
+                // Tagline
+                Text(
+                  character['tagline'] ?? '',
+                  textAlign: TextAlign.right,
+                  style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
+                    color: Colors.white.withOpacity(0.7),
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+
+                SizedBox(height: 1.h),
+
+                // Description
+                Text(
+                  character['description'] ?? 'لا يوجد وصف متاح',
+                  textAlign: TextAlign.right,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
+                    color: Colors.white.withOpacity(0.9),
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class CurvedBottomClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-
-    // Start from top left with curve
-    path.moveTo(0, 40);
-
-    // Create curved top
-    var firstControlPoint = Offset(size.width * 0.25, 0);
-    var firstEndPoint = Offset(size.width * 0.5, 20);
-    path.quadraticBezierTo(
-      firstControlPoint.dx,
-      firstControlPoint.dy,
-      firstEndPoint.dx,
-      firstEndPoint.dy,
-    );
-
-    var secondControlPoint = Offset(size.width * 0.75, 40);
-    var secondEndPoint = Offset(size.width, 20);
-    path.quadraticBezierTo(
-      secondControlPoint.dx,
-      secondControlPoint.dy,
-      secondEndPoint.dx,
-      secondEndPoint.dy,
-    );
-
-    // Complete the path
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
+// Example characters list (replace/add as needed)
+final List<Map<String, dynamic>> characters = [
+  {
+    'name': 'حرب أكتوبر',
+    'era': '1973',
+    'tagline': 'العبور العظيم',
+    'description': 'انتصار الجيش المصري على العدو في حرب أكتوبر.',
+    'imageAsset': 'assets/images/6th_october.svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'القاهرة من البرج',
+    'era': 'القرن العشرين',
+    'tagline': 'القاهرة الحديثة',
+    'description': 'منظر بانورامي للعاصمة المصرية من برج القاهرة.',
+    'imageAsset': 'assets/images/Cairo_from_Tower_(cropped).svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'معركة عين جالوت',
+    'era': '1260',
+    'tagline': 'النصر على المغول',
+    'description': 'أول انتصار حاسم على المغول بقيادة السلطان قطز.',
+    'imageAsset': 'assets/images/Campaign_of_the_Battle_of_Ain_Jalut-1260.svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'الكهرباء',
+    'era': 'العصر الحديث',
+    'tagline': 'النهضة التكنولوجية',
+    'description': 'بداية كهربة مصر وتطور البنية التحتية.',
+    'imageAsset': 'assets/images/electricity.svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'جمال عبد الناصر',
+    'era': '1952–1970',
+    'tagline': 'زعيم الثورة',
+    'description': 'أحد أبرز زعماء مصر في العصر الحديث.',
+    'imageAsset': 'assets/images/Gamal_Abdel_Naser_u_Beogradu_1962.svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'هرم خوفو',
+    'era': '2600 ق.م',
+    'tagline': 'أعجوبة الدنيا',
+    'description': 'أكبر أهرامات الجيزة وباقٍ حتى اليوم.',
+    'imageAsset': 'assets/images/Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'السد العالي',
+    'era': '1960',
+    'tagline': 'مشروع القرن',
+    'description': 'أحد أهم مشاريع مصر التنموية.',
+    'imageAsset': 'assets/images/high_dam.svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'حسين هيكل',
+    'era': 'القرن العشرين',
+    'tagline': 'المؤرخ والصحفي',
+    'description': 'من أبرز المفكرين والصحفيين المصريين.',
+    'imageAsset': 'assets/images/hussein_heki.svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'معركة قادش',
+    'era': '1274 ق.م',
+    'tagline': 'رمسيس الثاني ضد الحيثيين',
+    'description': 'واحدة من أشهر المعارك في التاريخ المصري القديم.',
+    'imageAsset': 'assets/images/Kadesh.svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'الملك نارمر',
+    'era': '3100 ق.م',
+    'tagline': 'موحد القطرين',
+    'description': 'أول ملوك مصر الموحدة.',
+    'imageAsset': 'assets/images/King_Narmer.svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'كليوباترا',
+    'era': '69–30 ق.م',
+    'tagline': 'آخر ملوك البطالمة',
+    'description': 'أشهر ملكات مصر وأكثرهن تأثيراً.',
+    'imageAsset': 'assets/images/Kleopatra-VII.-Altes-Museum-Berlin1.svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'البردي',
+    'era': 'العصر الفرعوني',
+    'tagline': 'ورق المصريين القدماء',
+    'description': 'أداة الكتابة الأساسية في مصر القديمة.',
+    'imageAsset': 'assets/images/papyrus.svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'رمسيس الثاني',
+    'era': '1279–1213 ق.م',
+    'tagline': 'أعظم فراعنة مصر',
+    'description': 'قائد عسكري وباني عظيم.',
+    'imageAsset': 'assets/images/Ramses_II_British_Museum.svg',
+    'isLocked': false,
+  },
+  {
+    'name': 'قناة السويس',
+    'era': '1869',
+    'tagline': 'شريان التجارة العالمية',
+    'description': 'واحدة من أهم الممرات المائية في العالم.',
+    'imageAsset': 'assets/images/suez_canal.svg',
+    'isLocked': false,
+  },
+  // Leave the last 2 placeholders as is
+  {
+    'name': 'قريباً',
+    'era': '...',
+    'tagline': 'بطاقة قيد الإضافة',
+    'description': 'لا يوجد وصف متاح',
+    'imageAsset': 'assets/images/placeholder1.svg',
+    'isLocked': true,
+  },
+  {
+    'name': 'قريباً',
+    'era': '...',
+    'tagline': 'بطاقة قيد الإضافة',
+    'description': 'لا يوجد وصف متاح',
+    'imageAsset': 'assets/images/placeholder2.svg',
+    'isLocked': true,
+  },
+];
