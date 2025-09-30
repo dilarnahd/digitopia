@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
-import '../../services/supabase_service.dart';
 import './widgets/app_logo_widget.dart';
 import './widgets/login_form_widget.dart';
 
@@ -27,86 +26,17 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin(String email, String password) async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
-    try {
-      // Use Supabase authentication
-      final response =
-          await SupabaseService.instance.client.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
-
-      if (response.user != null) {
-        // Success - navigate to home screen
-        HapticFeedback.heavyImpact();
-
-        if (mounted) {
-          Navigator.pushReplacementNamed(
-            context,
-            AppRoutes.homeDashboard, // Navigate to home instead of player info
-          );
-        }
-      }
-    } catch (error) {
-      // Show error message
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'خطأ في تسجيل الدخول: ${error.toString()}',
-              style: GoogleFonts.inter(color: Colors.white),
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.all(4.w),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
-      }
-    }
-
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _handleSocialLogin(String provider) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simulate social login process
-    await Future.delayed(const Duration(seconds: 1));
-
+    // Provide haptic feedback
     HapticFeedback.heavyImpact();
 
+    // Navigate directly to Home
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'تسجيل الدخول عبر $provider سيتم إضافته قريباً',
-            style: GoogleFonts.inter(color: Colors.white),
-          ),
-          backgroundColor: const Color(0xFF264653),
-          behavior: SnackBarBehavior.floating,
-          margin: EdgeInsets.all(4.w),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      );
-
-      setState(() {
-        _isLoading = false;
-      });
+      Navigator.pushReplacementNamed(context, AppRoutes.homeDashboard);
     }
+
+    setState(() => _isLoading = false);
   }
 
   @override
@@ -129,16 +59,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Center(
                   child: Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 6.w,
-                      vertical: 5.h,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 5.h),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE5C687),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
+                          color: Colors.black.withOpacity(0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -147,12 +74,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // App Logo Section with golden accents
                         const AppLogoWidget(),
-
                         SizedBox(height: 4.h),
 
-                        // Login Form
+                        // Keep the login form widget for UI
                         LoginFormWidget(
                           onLogin: _handleLogin,
                           isLoading: _isLoading,
@@ -160,13 +85,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         SizedBox(height: 2.h),
 
-                        // Sign Up Link - Updated to use pushReplacementNamed
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
                               'مستخدم جديد؟ ',
-                              style: GoogleFonts.inter(
+                              style: TextStyle(
                                 fontSize: 12.sp,
                                 color: const Color(0xFF264653),
                               ),
@@ -174,14 +98,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             GestureDetector(
                               onTap: () {
                                 HapticFeedback.lightImpact();
-                                Navigator.pushReplacementNamed(
-                                  context,
-                                  AppRoutes.signup,
-                                );
+                                Navigator.pushReplacementNamed(context, AppRoutes.signup);
                               },
                               child: Text(
                                 'إنشاء حساب',
-                                style: GoogleFonts.inter(
+                                style: TextStyle(
                                   fontSize: 12.sp,
                                   color: const Color(0xFF264653),
                                   fontWeight: FontWeight.w600,

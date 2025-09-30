@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; 
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
 import '../../services/supabase_service.dart';
+import '../onboarding_video_screen/onboarding_video_screen.dart'; // Import your onboarding video screen
 
 class PlayerInfoCollectionScreen extends StatefulWidget {
   const PlayerInfoCollectionScreen({super.key});
@@ -17,14 +18,6 @@ class PlayerInfoCollectionScreen extends StatefulWidget {
 class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
     with TickerProviderStateMixin {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _knowledgeController = TextEditingController();
-  final TextEditingController _identityController = TextEditingController();
-  final TextEditingController _interestController = TextEditingController();
-  final TextEditingController _learningController = TextEditingController();
-  final TextEditingController _gamingController = TextEditingController();
-  final TextEditingController _historicalController = TextEditingController();
 
   String? selectedAge;
   String? selectedLocation;
@@ -36,13 +29,11 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
   String? selectedHistorical;
 
   bool _isLoading = false;
-  int currentQuestionIndex = 0;
 
   final List<Map<String, dynamic>> egyptianQuestions = [
     {
       'question': 'اسمك ايه؟',
       'type': 'text',
-      'controller': null,
       'field': 'name',
     },
     {
@@ -110,19 +101,12 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
   @override
   void initState() {
     super.initState();
+    _loadSavedData();
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _ageController.dispose();
-    _locationController.dispose();
-    _knowledgeController.dispose();
-    _identityController.dispose();
-    _interestController.dispose();
-    _learningController.dispose();
-    _gamingController.dispose();
-    _historicalController.dispose();
     super.dispose();
   }
 
@@ -143,7 +127,7 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
         });
       }
     } catch (e) {
-      // Silent fail - continue with defaults
+      // Silent fail
     }
   }
 
@@ -153,10 +137,7 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
         selectedLocation != null &&
         selectedKnowledge != null &&
         selectedIdentity != null &&
-        selectedInterest != null &&
-        selectedLearning != null &&
-        selectedGaming != null &&
-        selectedHistorical != null;
+        selectedInterest != null;
   }
 
   double get _progressPercentage {
@@ -171,54 +152,6 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
     if (selectedGaming != null) answered++;
     if (selectedHistorical != null) answered++;
     return answered / egyptianQuestions.length;
-  }
-
-  Future<void> _handleContinue() async {
-    if (!_isFormValid) {
-      _showValidationMessage();
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    try {
-      await SupabaseService.instance.updatePlayerInfo(
-        playerName: _nameController.text.trim(),
-        playerAge: _getAgeValue(selectedAge!),
-        playerLocation: selectedLocation!,
-        egyptKnowledgeLevel: selectedKnowledge!,
-        egyptianIdentityFeeling: selectedIdentity!,
-        favoriteActivity: selectedInterest!,
-        learningPreference: selectedLearning!,
-        gamingFrequency: selectedGaming!,
-        historicalPeriodPreference: selectedHistorical!,
-        profileCompleted: true,
-        isFirstTime: false,
-      );
-
-      if (mounted) {
-        HapticFeedback.lightImpact();
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          AppRoutes.onboardingVideo,
-          (route) => false,
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        Fluttertoast.showToast(
-          msg: 'حدث خطأ، حاول مرة أخرى',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: AppTheme.lightTheme.colorScheme.error,
-          textColor: Colors.white,
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
   }
 
   int _getAgeValue(String ageRange) {
@@ -266,16 +199,13 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
                 child: Center(
                   child: Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 6.w,
-                      vertical: 5.h,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 5.h),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE5C687),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
+                          color: Colors.black.withOpacity(0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -284,7 +214,6 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Title
                         Text(
                           'عرفنا عليك',
                           style: GoogleFonts.inter(
@@ -294,15 +223,12 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
                           ),
                           textAlign: TextAlign.center,
                         ),
-
                         SizedBox(height: 3.h),
-
-                        // Progress Bar
                         Container(
                           width: double.infinity,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.3),
+                            color: Colors.white.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: LinearProgressIndicator(
@@ -311,13 +237,10 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
                             valueColor: const AlwaysStoppedAnimation<Color>(
                               Color(0xFF264653),
                             ),
-                            borderRadius: BorderRadius.circular(4),
+                            minHeight: 8,
                           ),
                         ),
-
                         SizedBox(height: 1.h),
-
-                        // Progress Text
                         Text(
                           '${(_progressPercentage * 100).round()}% مكتملة',
                           style: GoogleFonts.inter(
@@ -326,10 +249,7 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-
                         SizedBox(height: 4.h),
-
-                        // Questions
                         ...egyptianQuestions.asMap().entries.map((entry) {
                           final index = entry.key;
                           final question = entry.value;
@@ -338,43 +258,34 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
                             child: _buildQuestionWidget(question, index),
                           );
                         }).toList(),
-
                         SizedBox(height: 3.h),
-
-                        // Continue Button
                         SizedBox(
                           width: double.infinity,
                           height: 6.h,
                           child: ElevatedButton(
-                            onPressed: _isFormValid && !_isLoading
-                                ? _handleContinue
-                                : null,
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const OnboardingVideoScreen(),
+                                ),
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: _isFormValid && !_isLoading
-                                  ? const Color(0xFF264653)
-                                  : Colors.grey.shade400,
+                              backgroundColor: const Color(0xFF264653),
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               elevation: 2,
                             ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Text(
-                                    'متابعة إلى الفيديو',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
+                            child: Text(
+                              'متابعة إلى الفيديو',
+                              style: GoogleFonts.inter(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -397,7 +308,6 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // Question Label
         Padding(
           padding: EdgeInsets.only(bottom: 1.h),
           child: Text(
@@ -410,20 +320,16 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
             textAlign: TextAlign.right,
           ),
         ),
-
-        // Question Input
-        if (type == 'text') ...[
-          _buildTextInput(field),
-        ] else if (type == 'dropdown') ...[
+        if (type == 'text') _buildTextInput(),
+        if (type == 'dropdown')
           _buildDropdownInput(field, question['options'] as List<String>),
-        ] else if (type == 'options') ...[
+        if (type == 'options')
           _buildOptionsInput(field, question['options'] as List<String>),
-        ],
       ],
     );
   }
 
-  Widget _buildTextInput(String field) {
+  Widget _buildTextInput() {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
@@ -431,12 +337,12 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF264653).withValues(alpha: 0.2),
+          color: const Color(0xFF264653).withOpacity(0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -461,7 +367,7 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
           border: InputBorder.none,
           contentPadding: EdgeInsets.zero,
         ),
-        onChanged: (value) => setState(() {}),
+        onChanged: (_) => setState(() {}),
       ),
     );
   }
@@ -484,12 +390,12 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF264653).withValues(alpha: 0.2),
+          color: const Color(0xFF264653).withOpacity(0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -524,14 +430,8 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
           }).toList(),
           onChanged: (String? newValue) {
             setState(() {
-              switch (field) {
-                case 'age':
-                  selectedAge = newValue;
-                  break;
-                case 'location':
-                  selectedLocation = newValue;
-                  break;
-              }
+              if (field == 'age') selectedAge = newValue;
+              if (field == 'location') selectedLocation = newValue;
             });
           },
         ),
@@ -601,12 +501,12 @@ class _PlayerInfoCollectionScreenState extends State<PlayerInfoCollectionScreen>
                 border: Border.all(
                   color: isSelected
                       ? const Color(0xFF264653)
-                      : const Color(0xFF264653).withValues(alpha: 0.2),
+                      : const Color(0xFF264653).withOpacity(0.2),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: Colors.black.withOpacity(0.05),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
