@@ -1,10 +1,10 @@
-# Use official Flutter image
-FROM cirrusci/flutter:stable-web
+# Use a Flutter image with Dart 3.10 (includes Dart 3.6+)
+FROM ghcr.io/cirruslabs/flutter:3.10.0-web
 
-# Set working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy your entire project into the container
+# Copy all project files into the container
 COPY . .
 
 # Get Flutter dependencies
@@ -13,9 +13,5 @@ RUN flutter pub get
 # Build the web app
 RUN flutter build web
 
-# Expose port for web server
-EXPOSE 8080
-
-# Start the backend (replace with your actual start command if needed)
-# For example, if you use `dart run` to start your backend, adjust this line
-CMD ["flutter", "run", "-d", "web-server", "--web-port", "8080", "--web-hostname", "0.0.0.0"]
+# Start the web server
+CMD ["flutter", "run", "-d", "web-server", "--web-port", "10000", "--web-hostname", "0.0.0.0"]
