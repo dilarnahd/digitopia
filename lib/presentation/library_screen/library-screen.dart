@@ -1,305 +1,445 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../core/app_export.dart';
-class LibraryScreen extends StatelessWidget {
-  const LibraryScreen({super.key});
+import '../../core/app_export.dart';
+import './widgets/category_button_widget.dart';
+import './widgets/character_card_widget.dart';
+import './widgets/curved_header_widget.dart';
+import './widgets/shimmer_loading_widget.dart';
+
+class LibraryScreen extends StatefulWidget {
+  const LibraryScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("المكتبة"),
-        centerTitle: true,
-      ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: characters.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 12),
-        itemBuilder: (context, index) {
-          final character = characters[index];
-          return Card(
-            color: Colors.black.withOpacity(0.7),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: CharacterCardWidget(character: character),
-            ),
-          );
-        },
-      ),
-      backgroundColor: Colors.black,
-    );
-  }
+  State<LibraryScreen> createState() => _LibraryScreenState();
 }
 
+class _LibraryScreenState extends State<LibraryScreen> {
+  int _selectedCategoryIndex = 0;
+  bool _isLoading = false;
 
-class CharacterCardWidget extends StatelessWidget {
-  final Map<String, dynamic> character;
+  final List<Map<String, dynamic>> _categories = [
+    {'title': 'شخصيات', 'isLocked': false},
+    {'title': 'معارك', 'isLocked': false},
+    {'title': 'انجازات', 'isLocked': false},
+    {'title': 'أول-مرة', 'isLocked': false},
+  ];
 
-  const CharacterCardWidget({Key? key, required this.character})
-      : super(key: key);
+  final List<Map<String, dynamic>> _charactersData = [
+    {
+      'id': 1,
+      'name': 'رمسيس الثاني',
+      'era': 'فرعوني',
+      'tagline': 'فرعون الحروب والمعمار',
+      'description':
+          'فرعون مشهور من الأسرة التاسعة عشر، قاد مصر في العديد من الحروب وترك إرثاً عظيماً من المعابد والتماثيل.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/1/1d/Ramses_II.jpg',
+      'isLocked': false,
+    },
+    {
+      'id': 2,
+      'name': 'كليوباترا السابعة',
+      'era': 'بطلمي',
+      'tagline': 'ملكة مصر الأخيرة',
+      'description':
+          'الملكة الشهيرة التي حكمت مصر البِتْلمية، اشتهرت بذكائها السياسي وعلاقاتها مع روما، وحاولت حماية مصر من النفوذ الروماني.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/2/2e/Cleopatra_VII_of_Egypt_Altes_Museum_Berlin.jpg',
+      'isLocked': false,
+    },
+    {
+      'id': 3,
+      'name': 'جمال عبد الناصر',
+      'era': 'معاصر',
+      'tagline': 'رئيس مصر ورمز الوحدة العربية',
+      'description':
+          'رئيس مصر بين 1956 و1970، قاد ثورة 1952، وحقق مشاريع ضخمة مثل بناء السد العالي وتعزيز الوحدة العربية.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/4/44/Gamal_Abdel_Nasser.jpg',
+      'isLocked': false,
+    },
+    {
+      'id': 4,
+      'name': 'حسين هيكل',
+      'era': 'معاصر',
+      'tagline': 'رائد الصحافة المصرية',
+      'description':
+          'كاتب وصحفي مصري معروف، ساهم في تطوير الإعلام المصري والكتابة السياسية والاجتماعية في القرن العشرين.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/a/a3/Hussein_Hekal.jpg',
+      'isLocked': false,
+    },
+  ];
+
+  final List<Map<String, dynamic>> _battlesData = [
+    {
+      'id': 1,
+      'name': 'معركة قادش',
+      'era': 'فرعوني',
+      'tagline': 'أكبر معركة بحرية وعسكرية في العصر القديم',
+      'description':
+          'خاض رمسيس الثاني معركة قادش ضد الحيثيين في سوريا، وتميزت باستخدام العربات الحربية بشكل استراتيجي.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/7/7a/Battle_of_Kadesh_relief.jpg',
+      'isLocked': false,
+    },
+    {
+      'id': 2,
+      'name': 'ثورة 1919',
+      'era': 'حديث',
+      'tagline': 'الانتفاضة الوطنية ضد الاحتلال البريطاني',
+      'description':
+          'انتفاضة شعبية مصرية قادها سعد زغلول ضد الاحتلال البريطاني، وأسهمت في إحياء الروح الوطنية والمطالبة بالاستقلال.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/2/25/Egyptian_1919_revolution.jpg',
+      'isLocked': false,
+    },
+    {
+      'id': 3,
+      'name': 'حرب أكتوبر 1973',
+      'era': 'حديث',
+      'tagline': 'استرداد الأراضي المحتلة',
+      'description':
+          'حرب بين مصر وسوريا ضد إسرائيل لاستعادة الأراضي المحتلة، أظهرت الشجاعة المصرية والتخطيط العسكري المحترف.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/5/5c/Yom_Kippur_War_1973.jpg',
+      'isLocked': false,
+    },
+    {
+      'id': 4,
+      'name': 'معركة عين جالوت',
+      'era': 'إسلامي',
+      'tagline': 'تصدي المماليك للغزو المغولي',
+      'description':
+          'انتصار المماليك على المغول في فلسطين، والذي ساهم في حماية مصر والشام من الغزو المغولي.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/f/f5/Battle_of_Ain_Jalut.jpg',
+      'isLocked': false,
+    },
+  ];
+
+  final List<Map<String, dynamic>> _achievementsData = [
+    {
+      'id': 1,
+      'name': 'بناء الهرم الأكبر',
+      'era': 'فرعوني',
+      'tagline': 'أعجوبة معمارية عالمية',
+      'description':
+          'تم بناء هرم خوفو في الجيزة ليكون مقبرة فرعونية ضخمة، ويعتبر من عجائب العالم القديم.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/e/e3/Great_Pyramid_of_Giza.jpg',
+      'isLocked': false,
+    },
+    {
+      'id': 2,
+      'name': 'تأميم قناة السويس',
+      'era': 'حديث',
+      'tagline': 'خطوة نحو السيادة الوطنية',
+      'description':
+          'في 1956، قام جمال عبد الناصر بتأميم قناة السويس، مما أعاد لمصر السيطرة على طريق مائي حيوي ومصدر دخل رئيسي.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/1/17/Suez_Canal_Nationalization.jpg',
+      'isLocked': false,
+    },
+    {
+      'id': 3,
+      'name': 'إنشاء السد العالي',
+      'era': 'حديث',
+      'tagline': 'مشروع النهضة المصرية',
+      'description':
+          'السد العالي في أسوان الذي بنته الحكومة المصرية لتوفير المياه وتحسين الزراعة وتوليد الكهرباء.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/9/95/Aswan_High_Dam.jpg',
+      'isLocked': false,
+    },
+    {
+      'id': 4,
+      'name': 'تطوير القاهرة الحديثة',
+      'era': 'حديث',
+      'tagline': 'نهضة عمرانية وثقافية',
+      'description':
+          'توسيع وتحديث القاهرة خلال القرن العشرين لتعزيز التعليم والثقافة والبنية التحتية.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/d/d1/Cairo_modern.jpg',
+      'isLocked': false,
+    },
+  ];
+
+  final List<Map<String, dynamic>> _firstTimeData = [
+    {
+      'id': 1,
+      'name': 'أول فرعون موثق',
+      'era': 'فرعوني',
+      'tagline': 'توثيق أول حكم فرعوني',
+      'description':
+          'نارمر أو مينا هو أول فرعون موثق وحد مصر العليا والسفلى، ويعتبر بداية الدولة المصرية القديمة.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/5/54/Narmer_Palette.jpg',
+      'isLocked': false,
+    },
+    {
+      'id': 2,
+      'name': 'أول استخدام للورق البردي',
+      'era': 'فرعوني',
+      'tagline': 'اختراع الكتابة والورق',
+      'description':
+          'ابتكر المصريون القدماء استخدام البردي لتسجيل المعلومات والوثائق، مما ساهم في حفظ التاريخ والمعرفة.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/3/32/Papyrus_roll.jpg',
+      'isLocked': false,
+    },
+    {
+      'id': 3,
+      'name': 'أول محطة كهرباء في مصر',
+      'era': 'حديث',
+      'tagline': 'بداية الكهرباء في مصر',
+      'description':
+          'تم إنشاء أول محطة كهرباء في مصر لتوفير الطاقة للمصانع والمنازل، وبدأ عصر الحداثة.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/6/66/Cairo_electric_plant.jpg',
+      'isLocked': false,
+    },
+    {
+      'id': 4,
+      'name': 'أول جامعة مصرية حديثة',
+      'era': 'حديث',
+      'tagline': 'التعليم العالي المنظم',
+      'description':
+          'جامعة فؤاد الأول (جامعة القاهرة الآن) هي أول جامعة حديثة في مصر، أسست لتطوير التعليم العالي والبحث العلمي.',
+      'imageUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/0/0f/Cairo_University_1908.jpg',
+      'isLocked': false,
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadContent();
+  }
+
+  Future<void> _loadContent() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate loading time
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void _onCategoryTap(int index) {
+    setState(() {
+      _selectedCategoryIndex = index;
+    });
+    _loadContent();
+  }
+
+  List<Map<String, dynamic>> _getCurrentCategoryData() {
+    switch (_selectedCategoryIndex) {
+      case 0:
+        return _charactersData;
+      case 1:
+        return _battlesData;
+      case 2:
+        return _achievementsData;
+      case 3:
+        return _firstTimeData;
+      default:
+        return _charactersData;
+    }
+  }
+
+  void _onProfileTap() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'الملف الشخصي قريباً!',
+          textAlign: TextAlign.right,
+          style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+            color: AppTheme.lightTheme.colorScheme.onPrimary,
+          ),
+        ),
+        backgroundColor: AppTheme.lightTheme.colorScheme.primary,
+      ),
+    );
+  }
+
+  void _onSettingsTap() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'الإعدادات قريباً!',
+          textAlign: TextAlign.right,
+          style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+            color: AppTheme.lightTheme.colorScheme.onPrimary,
+          ),
+        ),
+        backgroundColor: AppTheme.lightTheme.colorScheme.primary,
+      ),
+    );
+  }
+
+  void _onHomeTap() {
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final bool isLocked = character['isLocked'] ?? false;
-    final String? imageAsset = character['imageAsset'];
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFe5c687), // Light beige/gold background
+        body: Column(
+          children: [
+            CurvedHeaderWidget(onHomeTap: _onHomeTap),
 
-    return Container(
-      child: Row(
-        textDirection: TextDirection.rtl,
-        children: [
-          // Character image square
-          Container(
-            width: 20.w,
-            height: 20.w,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.2),
-                width: 1,
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                color: const Color(0xFFe5c687),
+                child: _isLoading
+                    ? const ShimmerLoadingWidget()
+                    : RefreshIndicator(
+                        onRefresh: _loadContent,
+                        color: const Color(0xFF264653),
+                        child: _getCurrentCategoryData().isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CustomIconWidget(
+                                      iconName: 'inbox',
+                                      color: const Color(0xFF264653)
+                                          .withValues(alpha: 0.7),
+                                      size: 48,
+                                    ),
+                                    SizedBox(height: 2.h),
+                                    Text(
+                                      'لا يوجد محتوى متاح حالياً',
+                                      textAlign: TextAlign.right,
+                                      style: AppTheme
+                                          .lightTheme.textTheme.bodyLarge
+                                          ?.copyWith(
+                                        color: const Color(0xFF264653)
+                                            .withValues(alpha: 0.8),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : ListView.builder(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 4.w, vertical: 2.h),
+                                itemCount: _getCurrentCategoryData().length,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    margin: EdgeInsets.only(bottom: 2.h),
+                                    padding: EdgeInsets.all(4.w),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF264653),
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black
+                                              .withValues(alpha: 0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: CharacterCardWidget(
+                                      character:
+                                          _getCurrentCategoryData()[index],
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
               ),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: isLocked
-                  ? Container(
-                      color: Colors.white.withOpacity(0.1),
-                      child: Center(
-                        child: Icon(
-                          Icons.lock_outline,
-                          color: Colors.white.withOpacity(0.7),
-                          size: 24,
+
+            Container(
+              height: 20.h,
+              child: Stack(
+                children: [
+                  ClipPath(
+                    clipper: CurvedBottomClipper(),
+                    child: Container(
+                      height: 20.h,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF264653),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List.generate(
+                          _categories.length,
+                          (index) => CategoryButtonWidget(
+                            title: _categories[index]['title'],
+                            isSelected: _selectedCategoryIndex == index,
+                            isLocked: false,
+                            onTap: () => _onCategoryTap(index),
+                          ),
                         ),
                       ),
-                    )
-                  : imageAsset != null && imageAsset.endsWith('.svg')
-                      ? SvgPicture.asset(
-                          imageAsset,
-                          fit: BoxFit.contain,
-                          placeholderBuilder: (context) => Container(
-                            color: Colors.white.withOpacity(0.1),
-                            child: Center(
-                              child: Icon(
-                                Icons.person_outline,
-                                color: Colors.white.withOpacity(0.7),
-                                size: 24,
-                              ),
-                            ),
-                          ),
-                        )
-                      : Image.asset(
-                          imageAsset ?? '',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                            color: Colors.white.withOpacity(0.1),
-                            child: Center(
-                              child: Icon(
-                                Icons.person_outline,
-                                color: Colors.white.withOpacity(0.7),
-                                size: 24,
-                              ),
-                            ),
-                          ),
-                        ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-
-          SizedBox(width: 4.w),
-
-          // Character details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                // Name
-                Text(
-                  character['name'] ?? 'غير معروف',
-                  textAlign: TextAlign.right,
-                  style: AppTheme.lightTheme.textTheme.titleLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-
-                SizedBox(height: 1.h),
-
-                // Era
-                Text(
-                  character['era'] ?? 'غير محدد',
-                  textAlign: TextAlign.right,
-                  style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withOpacity(0.8),
-                  ),
-                ),
-
-                SizedBox(height: 0.5.h),
-
-                // Tagline
-                Text(
-                  character['tagline'] ?? '',
-                  textAlign: TextAlign.right,
-                  style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withOpacity(0.7),
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-
-                SizedBox(height: 1.h),
-
-                // Description
-                Text(
-                  character['description'] ?? 'لا يوجد وصف متاح',
-                  textAlign: TextAlign.right,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withOpacity(0.9),
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-// Example characters list (replace/add as needed)
-final List<Map<String, dynamic>> characters = [
-  {
-    'name': 'حرب أكتوبر',
-    'era': '1973',
-    'tagline': 'العبور العظيم',
-    'description': 'انتصار الجيش المصري على العدو في حرب أكتوبر.',
-    'imageAsset': 'assets/images/6th_october.svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'القاهرة من البرج',
-    'era': 'القرن العشرين',
-    'tagline': 'القاهرة الحديثة',
-    'description': 'منظر بانورامي للعاصمة المصرية من برج القاهرة.',
-    'imageAsset': 'assets/images/Cairo_from_Tower_(cropped).svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'معركة عين جالوت',
-    'era': '1260',
-    'tagline': 'النصر على المغول',
-    'description': 'أول انتصار حاسم على المغول بقيادة السلطان قطز.',
-    'imageAsset': 'assets/images/Campaign_of_the_Battle_of_Ain_Jalut-1260.svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'الكهرباء',
-    'era': 'العصر الحديث',
-    'tagline': 'النهضة التكنولوجية',
-    'description': 'بداية كهربة مصر وتطور البنية التحتية.',
-    'imageAsset': 'assets/images/electricity.svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'جمال عبد الناصر',
-    'era': '1952–1970',
-    'tagline': 'زعيم الثورة',
-    'description': 'أحد أبرز زعماء مصر في العصر الحديث.',
-    'imageAsset': 'assets/images/Gamal_Abdel_Naser_u_Beogradu_1962.svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'هرم خوفو',
-    'era': '2600 ق.م',
-    'tagline': 'أعجوبة الدنيا',
-    'description': 'أكبر أهرامات الجيزة وباقٍ حتى اليوم.',
-    'imageAsset': 'assets/images/Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'السد العالي',
-    'era': '1960',
-    'tagline': 'مشروع القرن',
-    'description': 'أحد أهم مشاريع مصر التنموية.',
-    'imageAsset': 'assets/images/high_dam.svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'حسين هيكل',
-    'era': 'القرن العشرين',
-    'tagline': 'المؤرخ والصحفي',
-    'description': 'من أبرز المفكرين والصحفيين المصريين.',
-    'imageAsset': 'assets/images/hussein_heki.svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'معركة قادش',
-    'era': '1274 ق.م',
-    'tagline': 'رمسيس الثاني ضد الحيثيين',
-    'description': 'واحدة من أشهر المعارك في التاريخ المصري القديم.',
-    'imageAsset': 'assets/images/Kadesh.svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'الملك نارمر',
-    'era': '3100 ق.م',
-    'tagline': 'موحد القطرين',
-    'description': 'أول ملوك مصر الموحدة.',
-    'imageAsset': 'assets/images/King_Narmer.svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'كليوباترا',
-    'era': '69–30 ق.م',
-    'tagline': 'آخر ملوك البطالمة',
-    'description': 'أشهر ملكات مصر وأكثرهن تأثيراً.',
-    'imageAsset': 'assets/images/Kleopatra-VII.-Altes-Museum-Berlin1.svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'البردي',
-    'era': 'العصر الفرعوني',
-    'tagline': 'ورق المصريين القدماء',
-    'description': 'أداة الكتابة الأساسية في مصر القديمة.',
-    'imageAsset': 'assets/images/papyrus.svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'رمسيس الثاني',
-    'era': '1279–1213 ق.م',
-    'tagline': 'أعظم فراعنة مصر',
-    'description': 'قائد عسكري وباني عظيم.',
-    'imageAsset': 'assets/images/Ramses_II_British_Museum.svg',
-    'isLocked': false,
-  },
-  {
-    'name': 'قناة السويس',
-    'era': '1869',
-    'tagline': 'شريان التجارة العالمية',
-    'description': 'واحدة من أهم الممرات المائية في العالم.',
-    'imageAsset': 'assets/images/suez_canal.svg',
-    'isLocked': false,
-  },
-  // Leave the last 2 placeholders as is
-  {
-    'name': 'قريباً',
-    'era': '...',
-    'tagline': 'بطاقة قيد الإضافة',
-    'description': 'لا يوجد وصف متاح',
-    'imageAsset': 'assets/images/placeholder1.svg',
-    'isLocked': true,
-  },
-  {
-    'name': 'قريباً',
-    'era': '...',
-    'tagline': 'بطاقة قيد الإضافة',
-    'description': 'لا يوجد وصف متاح',
-    'imageAsset': 'assets/images/placeholder2.svg',
-    'isLocked': true,
-  },
-];
+class CurvedBottomClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+
+    path.moveTo(0, 40);
+
+    var firstControlPoint = Offset(size.width * 0.25, 0);
+    var firstEndPoint = Offset(size.width * 0.5, 20);
+    path.quadraticBezierTo(
+      firstControlPoint.dx,
+      firstControlPoint.dy,
+      firstEndPoint.dx,
+      firstEndPoint.dy,
+    );
+
+    var secondControlPoint = Offset(size.width * 0.75, 40);
+    var secondEndPoint = Offset(size.width, 20);
+    path.quadraticBezierTo(
+      secondControlPoint.dx,
+      secondControlPoint.dy,
+      secondEndPoint.dx,
+      secondEndPoint.dy,
+    );
+
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
