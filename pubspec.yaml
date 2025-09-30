@@ -44,6 +44,10 @@ flutter:
     - assets/glyphs/djed_stability_glyph.svg
     - assets/glyphs/glyphs_video.mp4
     - assets/videos/home_video.mp4
+    - assets/images/main_game/pyramid.svg
+    - assets/images/main_game/character.png
+    - assets/images/main_game/block.png
+
 
   # CRITICAL ASSET MANAGEMENT RULES:
   # - DO NOT ADD NEW ASSET DIRECTORIES (assets/svg/, assets/icons/, etc.)

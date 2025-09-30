@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
@@ -7,14 +8,14 @@ import './widgets/character_card_widget.dart';
 import './widgets/curved_header_widget.dart';
 import './widgets/shimmer_loading_widget.dart';
 
-class LibraryScreen extends StatefulWidget {
-  const LibraryScreen({Key? key}) : super(key: key);
+class DictLibraryScreen extends StatefulWidget {
+  const DictLibraryScreen({Key? key}) : super(key: key);
 
   @override
-  State<LibraryScreen> createState() => _LibraryScreenState();
+  State<DictLibraryScreen> createState() => _DictLibraryScreenState();
 }
 
-class _LibraryScreenState extends State<LibraryScreen> {
+class _DictLibraryScreenState extends State<DictLibraryScreen> {
   int _selectedCategoryIndex = 0;
   bool _isLoading = false;
 
@@ -33,8 +34,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'فرعون الحروب والمعمار',
       'description':
           'فرعون مشهور من الأسرة التاسعة عشر، قاد مصر في العديد من الحروب وترك إرثاً عظيماً من المعابد والتماثيل.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/1/1d/Ramses_II.jpg',
+      'imageAsset': 'assets/images/Ramses_II_British_Museum.svg',
       'isLocked': false,
     },
     {
@@ -44,8 +44,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'ملكة مصر الأخيرة',
       'description':
           'الملكة الشهيرة التي حكمت مصر البِتْلمية، اشتهرت بذكائها السياسي وعلاقاتها مع روما، وحاولت حماية مصر من النفوذ الروماني.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/2/2e/Cleopatra_VII_of_Egypt_Altes_Museum_Berlin.jpg',
+      'imageAsset': 'assets/images/Kleopatra-VII.-Altes-Museum-Berlin1.svg',
       'isLocked': false,
     },
     {
@@ -55,8 +54,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'رئيس مصر ورمز الوحدة العربية',
       'description':
           'رئيس مصر بين 1956 و1970، قاد ثورة 1952، وحقق مشاريع ضخمة مثل بناء السد العالي وتعزيز الوحدة العربية.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/4/44/Gamal_Abdel_Nasser.jpg',
+      'imageAsset': 'assets/images/Gamal_Abdel_Naser_u_Beogradu,_1962 (1).svg',
       'isLocked': false,
     },
     {
@@ -66,8 +64,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'رائد الصحافة المصرية',
       'description':
           'كاتب وصحفي مصري معروف، ساهم في تطوير الإعلام المصري والكتابة السياسية والاجتماعية في القرن العشرين.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/a/a3/Hussein_Hekal.jpg',
+      'imageAsset': 'assets/images/hussein_hekl.svg',
       'isLocked': false,
     },
   ];
@@ -80,8 +77,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'أكبر معركة بحرية وعسكرية في العصر القديم',
       'description':
           'خاض رمسيس الثاني معركة قادش ضد الحيثيين في سوريا، وتميزت باستخدام العربات الحربية بشكل استراتيجي.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/7/7a/Battle_of_Kadesh_relief.jpg',
+      'imageAsset': 'assets/images/King_Narmer.svg',
       'isLocked': false,
     },
     {
@@ -91,8 +87,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'الانتفاضة الوطنية ضد الاحتلال البريطاني',
       'description':
           'انتفاضة شعبية مصرية قادها سعد زغلول ضد الاحتلال البريطاني، وأسهمت في إحياء الروح الوطنية والمطالبة بالاستقلال.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/2/25/Egyptian_1919_revolution.jpg',
+      'imageAsset': 'assets/images/Cairo_From_Tower_(cropped).svg',
       'isLocked': false,
     },
     {
@@ -102,8 +97,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'استرداد الأراضي المحتلة',
       'description':
           'حرب بين مصر وسوريا ضد إسرائيل لاستعادة الأراضي المحتلة، أظهرت الشجاعة المصرية والتخطيط العسكري المحترف.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/5/5c/Yom_Kippur_War_1973.jpg',
+      'imageAsset': 'assets/images/high_dam.svg',
       'isLocked': false,
     },
     {
@@ -113,8 +107,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'تصدي المماليك للغزو المغولي',
       'description':
           'انتصار المماليك على المغول في فلسطين، والذي ساهم في حماية مصر والشام من الغزو المغولي.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/f/f5/Battle_of_Ain_Jalut.jpg',
+      'imageAsset': 'assets/images/Campaign_of_the_Battle_of_Ain_Jalut_1260.svg.svg',
       'isLocked': false,
     },
   ];
@@ -127,8 +120,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'أعجوبة معمارية عالمية',
       'description':
           'تم بناء هرم خوفو في الجيزة ليكون مقبرة فرعونية ضخمة، ويعتبر من عجائب العالم القديم.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/e/e3/Great_Pyramid_of_Giza.jpg',
+      'imageAsset': 'assets/images/Great_Pyramid_of_Giza_-_Pyramid_of_Khufu.svg',
       'isLocked': false,
     },
     {
@@ -138,8 +130,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'خطوة نحو السيادة الوطنية',
       'description':
           'في 1956، قام جمال عبد الناصر بتأميم قناة السويس، مما أعاد لمصر السيطرة على طريق مائي حيوي ومصدر دخل رئيسي.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/1/17/Suez_Canal_Nationalization.jpg',
+      'imageAsset': 'assets/images/suez_canal.svg',
       'isLocked': false,
     },
     {
@@ -149,8 +140,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'مشروع النهضة المصرية',
       'description':
           'السد العالي في أسوان الذي بنته الحكومة المصرية لتوفير المياه وتحسين الزراعة وتوليد الكهرباء.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/9/95/Aswan_High_Dam.jpg',
+      'imageAsset': 'assets/images/electricity.svg',
       'isLocked': false,
     },
     {
@@ -160,8 +150,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'نهضة عمرانية وثقافية',
       'description':
           'توسيع وتحديث القاهرة خلال القرن العشرين لتعزيز التعليم والثقافة والبنية التحتية.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/d/d1/Cairo_modern.jpg',
+      'imageAsset': 'assets/images/Cairo_University_Crest.svg',
       'isLocked': false,
     },
   ];
@@ -174,8 +163,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'توثيق أول حكم فرعوني',
       'description':
           'نارمر أو مينا هو أول فرعون موثق وحد مصر العليا والسفلى، ويعتبر بداية الدولة المصرية القديمة.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/5/54/Narmer_Palette.jpg',
+      'imageAsset': 'assets/images/King_Narmer.svg',
       'isLocked': false,
     },
     {
@@ -185,8 +173,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'اختراع الكتابة والورق',
       'description':
           'ابتكر المصريون القدماء استخدام البردي لتسجيل المعلومات والوثائق، مما ساهم في حفظ التاريخ والمعرفة.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/3/32/Papyrus_roll.jpg',
+      'imageAsset': 'assets/images/papyrus.svg',
       'isLocked': false,
     },
     {
@@ -196,8 +183,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'بداية الكهرباء في مصر',
       'description':
           'تم إنشاء أول محطة كهرباء في مصر لتوفير الطاقة للمصانع والمنازل، وبدأ عصر الحداثة.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/6/66/Cairo_electric_plant.jpg',
+      'imageAsset': 'assets/images/electricity.svg',
       'isLocked': false,
     },
     {
@@ -207,8 +193,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       'tagline': 'التعليم العالي المنظم',
       'description':
           'جامعة فؤاد الأول (جامعة القاهرة الآن) هي أول جامعة حديثة في مصر، أسست لتطوير التعليم العالي والبحث العلمي.',
-      'imageUrl':
-          'https://upload.wikimedia.org/wikipedia/commons/0/0f/Cairo_University_1908.jpg',
+      'imageAsset': 'assets/images/Cairo_University_Crest.svg',
       'isLocked': false,
     },
   ];
@@ -224,7 +209,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
       _isLoading = true;
     });
 
-    // Simulate loading time
     await Future.delayed(const Duration(milliseconds: 1500));
 
     setState(() {
@@ -293,11 +277,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFe5c687), // Light beige/gold background
+        backgroundColor: const Color(0xFFe5c687),
         body: Column(
           children: [
             CurvedHeaderWidget(onHomeTap: _onHomeTap),
-
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -315,7 +298,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                     CustomIconWidget(
                                       iconName: 'inbox',
                                       color: const Color(0xFF264653)
-                                          .withValues(alpha: 0.7),
+                                          .withOpacity(0.7),
                                       size: 48,
                                     ),
                                     SizedBox(height: 2.h),
@@ -326,7 +309,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                           .lightTheme.textTheme.bodyLarge
                                           ?.copyWith(
                                         color: const Color(0xFF264653)
-                                            .withValues(alpha: 0.8),
+                                            .withOpacity(0.8),
                                       ),
                                     ),
                                   ],
@@ -337,6 +320,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                     horizontal: 4.w, vertical: 2.h),
                                 itemCount: _getCurrentCategoryData().length,
                                 itemBuilder: (context, index) {
+                                  final character =
+                                      _getCurrentCategoryData()[index];
                                   return Container(
                                     margin: EdgeInsets.only(bottom: 2.h),
                                     padding: EdgeInsets.all(4.w),
@@ -345,16 +330,27 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                       borderRadius: BorderRadius.circular(16),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black
-                                              .withValues(alpha: 0.1),
+                                          color: Colors.black.withOpacity(0.1),
                                           blurRadius: 8,
                                           offset: const Offset(0, 4),
                                         ),
                                       ],
                                     ),
-                                    child: CharacterCardWidget(
-                                      character:
-                                          _getCurrentCategoryData()[index],
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SvgPicture.asset(
+                                          character['imageAsset'],
+                                          width: double.infinity,
+                                          height: 150,
+                                          fit: BoxFit.contain,
+                                        ),
+                                        SizedBox(height: 2.h),
+                                        CharacterCardWidget(
+                                          character: character,
+                                        ),
+                                      ],
                                     ),
                                   );
                                 },
@@ -362,7 +358,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       ),
               ),
             ),
-
             Container(
               height: 20.h,
               child: Stack(
@@ -442,4 +437,3 @@ class CurvedBottomClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
-

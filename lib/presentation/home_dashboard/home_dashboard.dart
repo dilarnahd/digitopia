@@ -1,14 +1,16 @@
-import 'package:egyptquest/presentation/library_screen/library-screen.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../library_screen/Library-screen.dart';
-import 'package:egyptquest/presentation/interactive_timeline/interactive_timeline.dart';
 import '../../core/app_export.dart';
 import '../../theme/app_theme.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+// ✅ Screens
+import 'main_game.dart';
+import '../llibrary_screen/dictlibrary.dart';
+import '../interactive_timeline/interactive_timeline.dart';
 
 class HomeDashboard extends StatefulWidget {
   const HomeDashboard({super.key});
@@ -34,7 +36,6 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
         setState(() {
           _isVideoInitialized = true;
           _videoController.play();
-          // Video does not loop
         });
       });
   }
@@ -46,7 +47,11 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
           _hasStartedJourney = true;
         });
       }
-      Navigator.pushNamed(context, AppRoutes.onboardingVideo);
+      // ✅ navigate to main_game.dart
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MainGame()),
+      );
     } catch (e) {
       print('Error starting journey: $e');
     }
@@ -57,7 +62,7 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
       case 'library':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const LibraryScreen()),
+          MaterialPageRoute(builder: (context) => const DictLibraryScreen()),
         );
         break;
 
@@ -66,7 +71,8 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
         break;
 
       case 'chatbot':
-        final Uri url = Uri.parse('https://www.chatbase.co/wf57UJjvXgYfyHQRSQoiu/help');
+        final Uri url = Uri.parse(
+            'https://www.chatbase.co/wf57UJjvXgYfyHQRSQoiu/help');
         if (await canLaunchUrl(url)) {
           await launchUrl(url, mode: LaunchMode.externalApplication);
         } else {
@@ -110,7 +116,7 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
       backgroundColor: AppTheme.secondaryLight,
       body: Column(
         children: [
-          // Top curved section without buttons
+          // Top curved section
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -125,9 +131,7 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
                 padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
                 child: Column(
                   children: [
-                    SizedBox(height: 2.h), // Space at top
-
-                    // Welcome message without Guest
+                    SizedBox(height: 2.h),
                     Text(
                       'اهلا بيك في رحلتك لاكتشاف حضارتك. أصلك و تاريخك',
                       style: GoogleFonts.inter(
@@ -137,7 +141,6 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
                       ),
                       textAlign: TextAlign.center,
                     ),
-
                     SizedBox(height: 3.h),
                   ],
                 ),
@@ -150,7 +153,6 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Home video container (square)
                 Container(
                   width: 70.w,
                   height: 70.w,
@@ -216,7 +218,7 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
             ),
           ),
 
-          // Big journey button at the bottom
+          // Journey button
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
             child: GestureDetector(
@@ -249,7 +251,7 @@ class _HomeDashboardState extends State<HomeDashboard> with TickerProviderStateM
             ),
           ),
 
-          // Bottom curved section with navigation buttons slightly lowered
+          // Bottom curved nav bar
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
