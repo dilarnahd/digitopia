@@ -1,18 +1,17 @@
-# Use a Flutter image with Dart 3.10 (includes Dart 3.6+)
-FROM lambiengcode/flutter:3.10.6
+# Use a public Flutter image with Dart 3.6+ (latest stable)
+FROM cirrusci/flutter:stable-web
 
-# Set working directory
 WORKDIR /app
 
-# Copy all project files into the container
 COPY . .
 
-# Get Flutter dependencies
+# Upgrade Flutter to latest stable inside container
+RUN flutter upgrade
+
 RUN flutter pub get
+RUN flutter build web --release
 
-# Build the web app
-RUN flutter build web
+EXPOSE 10000
 
-# Start the web server
 CMD ["flutter", "run", "-d", "web-server", "--web-port", "10000", "--web-hostname", "0.0.0.0"]
 
