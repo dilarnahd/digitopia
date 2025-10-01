@@ -1,5 +1,5 @@
 # Use a Flutter image with Dart 3.10 (includes Dart 3.6+)
-FROM ghcr.io/cirruslabs/flutter:3.10.0-web
+FROM lambiengcode/flutter:3.10.6
 
 # Set working directory
 WORKDIR /app
@@ -15,3 +15,4 @@ RUN flutter build web
 
 # Start the web server
 CMD ["flutter", "run", "-d", "web-server", "--web-port", "10000", "--web-hostname", "0.0.0.0"]
+
